@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEX Pulse · AI FinOps · Sprint 10</title>
+<title>APEX Pulse · AI FinOps · Sprint 16</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -133,22 +133,25 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
   <div class="sb-sec">Financial</div>
   <div class="sb-item" onclick="nav('budget',this)"><span class="sb-ic">◫</span>Budget &amp; Forecast</div>
   <div class="sb-item" onclick="nav('optimization',this)"><span class="sb-ic">↗</span>Optimization</div>
+  <div class="sb-item" onclick="nav('forecast',this)"><span class="sb-ic">↗</span>Spend Forecast<span class="sb-new">S10</span></div>
+  <div class="sb-item" onclick="nav('subscriptions',this)"><span class="sb-ic">◑</span>Subscriptions<span class="sb-new">S12</span></div>
 
   <div class="sb-sec">Developer</div>
   <div class="sb-item" onclick="nav('effectiveness',this)"><span class="sb-ic">⟳</span>Coding Effectiveness</div>
   <div class="sb-item" onclick="nav('playground',this)"><span class="sb-ic">⚡</span>API Playground<span class="sb-live">LIVE</span></div>
 
-  <div class="sb-sec">Governance · S7–S8</div>
+  <div class="sb-sec">Governance · S7–S16</div>
   <div class="sb-item" onclick="nav('governance',this)"><span class="sb-ic">◉</span>RBAC &amp; Policies</div>
   <div class="sb-item" onclick="nav('alerts',this)"><span class="sb-ic">◈</span>Alerts &amp; Incidents<span class="sb-badge">3</span></div>
+  <div class="sb-item" onclick="nav('budgetrules',this)"><span class="sb-ic">⚙</span>Budget Rules<span class="sb-new">S16</span></div>
+  <div class="sb-item" onclick="nav('webhooks',this)"><span class="sb-ic">⊛</span>Webhooks<span class="sb-new">S14</span></div>
 
-  <div class="sb-sec">Admin · S9–S10</div>
-  <div class="sb-item" onclick="nav('integrations',this)"><span class="sb-ic">⊞</span>Integrations</div>
-  <div class="sb-item" onclick="nav('users',this)"><span class="sb-ic">◎</span>Users<span class="sb-new">S9</span></div>
-  <div class="sb-item" onclick="nav('forecast',this)"><span class="sb-ic">↗</span>Spend Forecast<span class="sb-new">S10</span></div>
+  <div class="sb-sec">Admin · S9–S13</div>
+  <div class="sb-item" onclick="nav('integrations',this)"><span class="sb-ic">⊞</span>Integrations<span class="sb-new">S11</span></div>
+  <div class="sb-item" onclick="nav('users',this)"><span class="sb-ic">◎</span>Users<span class="sb-new">S13</span></div>
   <div class="sb-item" onclick="nav('settings',this)"><span class="sb-ic">⚙</span>Settings</div>
 
-  <div class="sb-foot">APEX Pulse · Sprint 10 · v10.0.0<br>Alert Persistence · Users · Forecasting</div>
+  <div class="sb-foot">APEX Pulse · Sprint 16 · v16.0.0<br>SSO/SCIM · Webhooks · Budget Automation</div>
 </nav>
 
 <!-- MAIN -->
@@ -159,10 +162,10 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
         <span class="tb-icon" id="tb-ic">▣</span>
         <div class="tb-title" id="tb-title">Executive Overview</div>
       </div>
-      <div class="tb-sub" id="tb-sub">June 2026 · Multi-provider · Sprint 10</div>
+      <div class="tb-sub" id="tb-sub">June 2026 · Multi-provider · Sprint 16</div>
     </div>
     <div class="tb-r">
-      <span class="tb-s7">S10 · v10.0.0</span>
+      <span class="tb-s7">S16 · v16.0.0</span>
       <div class="tb-live"><span class="ldot"></span>live</div>
     </div>
   </div>
@@ -836,16 +839,16 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
   </div>
 </div>
 
-<!-- ── PAGE: INTEGRATIONS (S7) ────────────────────────────────────────────── -->
+<!-- ── PAGE: INTEGRATIONS & KEY VAULT (S7, S11) ────────────────────────────── -->
 <div id="pg-integrations" class="page">
   <div class="kpis">
-    <div class="kpi"><div class="kl">Connected</div><div class="kv" style="color:var(--green)">2</div><div class="ks">Anthropic + OpenAI active</div></div>
-    <div class="kpi"><div class="kl">API Providers</div><div class="kv">2<span class="ku"> / 5</span></div><div class="ks">3 need keys to activate</div></div>
-    <div class="kpi"><div class="kl">Webhooks</div><div class="kv">0<span class="ku"> / 2</span></div><div class="ks">Slack + HTTP available</div></div>
+    <div class="kpi"><div class="kl">Active</div><div class="kv" style="color:var(--green)">2</div><div class="ks">connected</div></div>
+    <div class="kpi"><div class="kl">Key Vault</div><div class="kv">2</div><div class="ks">encrypted · AES-256-GCM · S11</div></div>
+    <div class="kpi"><div class="kl">Via Env Var</div><div class="kv">0</div><div class="ks">fallback if no vault key</div></div>
     <div class="kpi"><div class="kl">Auth</div><div class="kv" style="color:var(--amber);font-size:14px">Open</div><div class="ks">Set NEXTAUTH_SECRET to enable</div></div>
   </div>
   <div class="panel" style="margin-top:0">
-    <div class="ph"><div><div class="pt">API Providers</div><div class="ps">Set env vars in .env.local to activate</div></div><span class="pill">2 / 5 ACTIVE</span></div>
+    <div class="ph"><div><div class="pt">API Providers</div><div class="ps">Connect from the browser — keys encrypted at rest, never returned in plaintext · S11</div></div><span class="pill">2 / 5 ACTIVE</span></div>
     <div id="int-list"></div>
   </div>
   <div class="panel">
@@ -853,24 +856,29 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
     <div id="int-list2"></div>
   </div>
   <div class="panel">
-    <div class="ph"><div><div class="pt">How to Connect</div><div class="ps">Copy .env.example → .env.local, add keys, restart</div></div></div>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-      <code class="mono" style="font-size:10px;padding:6px 10px;border-radius:7px;background:rgba(55,138,221,.07);color:var(--accent);display:block">cp .env.example .env.local</code>
-      <code class="mono" style="font-size:10px;padding:6px 10px;border-radius:7px;background:rgba(55,138,221,.07);color:var(--accent);display:block"># Add ANTHROPIC_API_KEY, OPENAI_API_KEY, SLACK_WEBHOOK_URL …</code>
-      <code class="mono" style="font-size:10px;padding:6px 10px;border-radius:7px;background:rgba(55,138,221,.07);color:var(--accent);display:block">npm run dev   # restart to pick up new env vars</code>
+    <div class="ph"><div><div class="pt">Connect a Provider</div><div class="ps">In-app key vault modal · S11</div></div></div>
+    <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:11px;background:rgba(55,138,221,.04);border:1px solid rgba(133,183,235,.10);flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:12.5px;font-weight:600;margin-bottom:4px">Test-before-save</div>
+        <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.42);line-height:1.6">Paste a key → <strong style="color:var(--accent)">Test Connection</strong> fires a cheap real API call to validate it → <strong style="color:var(--accent)">Save to Vault</strong> encrypts with AES-256-GCM and stores it in the database. Re-entering a key zeroes the old one immediately. Source badges show <strong style="color:var(--green)">● VAULT</strong> / <strong style="color:var(--blue)">● ENV</strong> / <strong style="color:rgba(133,183,235,.40)">○ NOT SET</strong> per provider.</div>
+      </div>
+      <button disabled style="padding:9px 18px;border-radius:9px;background:rgba(55,138,221,.15);border:1px solid rgba(55,138,221,.28);color:var(--accent);font-family:var(--mono);font-size:11px;flex-shrink:0">Connect Provider →</button>
+    </div>
+    <div class="mono" style="font-size:9px;color:rgba(133,183,235,.28);margin-top:10px;line-height:1.6">
+      Key vault: <code style="color:rgba(133,183,235,.50)">PUT /api/integrations/providers</code> (admin) · test: <code style="color:rgba(133,183,235,.50)">POST /api/integrations/providers/test</code> · all key add/remove events logged to the audit trail (the key value itself is never logged).
     </div>
   </div>
 </div>
-<!-- ── PAGE: SETTINGS (S6–S10) ─────────────────────────────────────────────── -->
+<!-- ── PAGE: SETTINGS (S6–S16) ─────────────────────────────────────────────── -->
 <div id="pg-settings" class="page">
   <div class="kpis">
-    <div class="kpi"><div class="kl">App Version</div><div class="kv" style="font-size:16px">10.0.0</div><div class="ks">Sprint 10 · Full Platform</div></div>
-    <div class="kpi"><div class="kl">Sprint</div><div class="kv">S10</div><div class="ks">Forecast + Users + Alerts + RBAC</div></div>
+    <div class="kpi"><div class="kl">App Version</div><div class="kv" style="font-size:16px">16.0.0</div><div class="ks">Sprint 16 · Full Platform</div></div>
+    <div class="kpi"><div class="kl">Sprint</div><div class="kv">S16</div><div class="ks">SSO/SCIM + Webhooks + Budget Rules</div></div>
     <div class="kpi"><div class="kl">Auth</div><div class="kv" style="color:var(--amber);font-size:14px">Open</div><div class="ks">Set NEXTAUTH_SECRET to enable</div></div>
-    <div class="kpi"><div class="kl">Config Keys</div><div class="kv">17</div><div class="ks">Live-editable · 60s TTL cache</div></div>
+    <div class="kpi"><div class="kl">Config Keys</div><div class="kv">18</div><div class="ks">Live-editable · 60s TTL cache</div></div>
   </div>
   <div class="panel" style="margin-top:0">
-    <div class="ph"><div><div class="pt">Runtime Config</div><div class="ps">17 keys · changes stored in AppConfig DB · take effect within 60s · no restart needed</div></div><span class="pill">LIVE EDIT · S6</span></div>
+    <div class="ph"><div><div class="pt">Runtime Config</div><div class="ps">18 keys · changes stored in AppConfig DB · take effect within 60s · no restart needed</div></div><span class="pill">LIVE EDIT · S6</span></div>
     <div id="cfg-editor"></div>
     <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.30);margin-top:12px;line-height:1.6">
       All writes require <strong style="color:rgba(133,183,235,.50)">admin</strong> role and are logged to the audit trail.<br>
@@ -887,6 +895,14 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
       <div style="display:flex;align-items:center;gap:12px"><code class="mono" style="font-size:10px;padding:4px 9px;border-radius:6px;background:rgba(55,138,221,.07);color:var(--accent);flex-shrink:0;white-space:nowrap">make k8s-apply</code><span class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">Deploy to Kubernetes (k8s/ manifests)</span></div>
     </div>
   </div>
+  <div class="panel">
+    <div class="ph"><div><div class="pt">SSO &amp; SCIM Env Vars</div><div class="ps">New in S13 — all optional, feature degrades gracefully when unset</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:12px"><code class="mono" style="font-size:10px;padding:4px 9px;border-radius:6px;background:rgba(55,138,221,.07);color:var(--accent);flex-shrink:0;white-space:nowrap">OIDC_ISSUER</code><span class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">Okta / Azure AD / Google Workspace discovery URL</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><code class="mono" style="font-size:10px;padding:4px 9px;border-radius:6px;background:rgba(55,138,221,.07);color:var(--accent);flex-shrink:0;white-space:nowrap">OIDC_CLIENT_ID / _SECRET</code><span class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">App registration credentials from the IdP</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><code class="mono" style="font-size:10px;padding:4px 9px;border-radius:6px;background:rgba(55,138,221,.07);color:var(--accent);flex-shrink:0;white-space:nowrap">SCIM_BEARER_TOKEN</code><span class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">Static token shared with the IdP's SCIM app config</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- ── PAGE: USERS (S9) ────────────────────────────────────────────────────── -->
@@ -896,12 +912,17 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
     <div class="kpi"><div class="kl">Active</div><div class="kv" style="color:var(--green)">3</div><div class="ks">Can log in</div></div>
     <div class="kpi"><div class="kl">Admins</div><div class="kv" style="color:var(--red)">1</div><div class="ks">Full platform access</div></div>
     <div class="kpi"><div class="kl">Viewers</div><div class="kv">1</div><div class="ks">Read-only role</div></div>
+    <div class="kpi"><div class="kl">MFA Enabled</div><div class="kv" style="color:var(--green)">1</div><div class="ks">TOTP enrolled</div></div>
+    <div class="kpi"><div class="kl">SSO Users</div><div class="kv">1</div><div class="ks">via Okta</div></div>
   </div>
 
   <div class="panel" style="margin-top:0">
     <div class="ph">
-      <div><div class="pt">Users</div><div class="ps">Manage roles · invite · deactivate · all writes logged to audit trail · S9</div></div>
-      <button onclick="document.getElementById('invite-modal').style.display='flex'" style="padding:6px 14px;border-radius:8px;background:rgba(55,138,221,.15);border:1px solid rgba(55,138,221,.30);color:var(--accent);font-family:var(--mono);font-size:10px;cursor:pointer">+ Invite</button>
+      <div><div class="pt">Users</div><div class="ps">Manage roles · invite · deactivate · all writes logged to audit trail · S9, S13</div></div>
+      <div style="display:flex;gap:8px">
+        <button style="padding:6px 14px;border-radius:8px;background:rgba(55,138,221,.08);border:1px solid rgba(133,183,235,.16);color:rgba(133,183,235,.70);font-family:var(--mono);font-size:10px;cursor:pointer">Bulk Invite (CSV)</button>
+        <button onclick="document.getElementById('invite-modal').style.display='flex'" style="padding:6px 14px;border-radius:8px;background:rgba(55,138,221,.15);border:1px solid rgba(55,138,221,.30);color:var(--accent);font-family:var(--mono);font-size:10px;cursor:pointer">+ Invite</button>
+      </div>
     </div>
     <table style="width:100%;border-collapse:collapse;margin-top:8px">
       <thead><tr>
@@ -913,7 +934,7 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
       </tr></thead>
       <tbody>
         <tr style="border-bottom:1px solid rgba(133,183,235,.05)">
-          <td style="padding:10px;font-size:12.5px;font-weight:600">Alice Chen</td>
+          <td style="padding:10px;font-size:12.5px;font-weight:600">Alice Chen <span style="font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:4px;background:rgba(34,160,107,.12);color:var(--green);font-weight:400">🔒 MFA</span></td>
           <td style="padding:10px;font-family:var(--mono);font-size:10px;color:rgba(133,183,235,.55)">alice@acme.ai</td>
           <td style="padding:10px"><span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(226,75,74,.12);color:var(--red);border:1px solid rgba(226,75,74,.25)">admin</span></td>
           <td style="padding:10px"><span style="font-family:var(--mono);font-size:9px;color:var(--green)">● active</span></td>
@@ -927,7 +948,7 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
           <td style="padding:10px;text-align:center"><button style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:6px;background:rgba(133,183,235,.06);border:1px solid rgba(133,183,235,.12);color:rgba(133,183,235,.50);cursor:pointer">Edit</button></td>
         </tr>
         <tr style="border-bottom:1px solid rgba(133,183,235,.05)">
-          <td style="padding:10px;font-size:12.5px;font-weight:600">Priya Rajan</td>
+          <td style="padding:10px;font-size:12.5px;font-weight:600">Priya Rajan <span style="font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:4px;background:rgba(55,138,221,.12);color:var(--accent);font-weight:400">okta</span></td>
           <td style="padding:10px;font-family:var(--mono);font-size:10px;color:rgba(133,183,235,.55)">priya@acme.ai</td>
           <td style="padding:10px"><span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(201,138,32,.12);color:var(--amber);border:1px solid rgba(201,138,32,.25)">manager</span></td>
           <td style="padding:10px"><span style="font-family:var(--mono);font-size:9px;color:var(--green)">● active</span></td>
@@ -940,6 +961,36 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
           <td style="padding:10px"><span style="font-family:var(--mono);font-size:9px;color:rgba(133,183,235,.35)">○ inactive</span></td>
           <td style="padding:10px;text-align:center"><button style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:6px;background:rgba(133,183,235,.06);border:1px solid rgba(133,183,235,.12);color:rgba(133,183,235,.50);cursor:pointer">Edit</button></td>
         </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div><div class="pt">SSO Group → Role Mapping</div><div class="ps">IdP groups (Okta / Azure AD) mapped to APEX Pulse roles on every SSO sign-in &amp; SCIM push · S13</div></div></div>
+    <div style="display:flex;gap:10px;margin-top:8px;margin-bottom:10px;flex-wrap:wrap">
+      <input placeholder="e.g. finops-admins" disabled style="flex:1;min-width:160px;padding:7px 10px;border-radius:7px;background:rgba(55,138,221,.05);border:1px solid rgba(133,183,235,.12);color:rgba(133,183,235,.40);font-family:var(--mono);font-size:11px;outline:none" />
+      <button disabled style="padding:7px 14px;border-radius:7px;background:rgba(55,138,221,.10);border:1px solid rgba(133,183,235,.15);color:rgba(133,183,235,.45);font-family:var(--mono);font-size:10.5px">+ Add</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:20px;background:rgba(133,183,235,.05);border:1px solid rgba(133,183,235,.12)">
+        <span class="mono" style="font-size:10.5px">finops-admins</span><span style="color:rgba(133,183,235,.30);font-size:10px">→</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(226,75,74,.12);color:var(--red);border:1px solid rgba(226,75,74,.25)">admin</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:20px;background:rgba(133,183,235,.05);border:1px solid rgba(133,183,235,.12)">
+        <span class="mono" style="font-size:10.5px">finops-readonly</span><span style="color:rgba(133,183,235,.30);font-size:10px">→</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(133,183,235,.06);color:rgba(133,183,235,.50);border:1px solid rgba(133,183,235,.12)">viewer</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div><div class="pt">Active Sessions</div><div class="ps">Enforced on every request · force-expire signs a device out on its very next request · S13</div></div><span class="pill">3 ACTIVE</span></div>
+    <table class="tbl">
+      <thead><tr><th>USER</th><th>ROLE</th><th>STARTED</th><th>LAST SEEN</th><th></th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--text)">Alice Chen</td><td><span class="tag" style="background:rgba(226,75,74,.12);color:var(--red)">admin</span></td><td class="mono">3h ago</td><td class="mono">1m ago</td><td style="text-align:right"><button style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:6px;background:rgba(226,75,74,.10);border:1px solid rgba(226,75,74,.20);color:#E24B4A;cursor:pointer">Force-expire</button></td></tr>
+        <tr><td style="color:var(--text)">Priya Rajan</td><td><span class="tag" style="background:rgba(201,138,32,.12);color:var(--amber)">manager</span></td><td class="mono">1d ago</td><td class="mono">14m ago</td><td style="text-align:right"><button style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:6px;background:rgba(226,75,74,.10);border:1px solid rgba(226,75,74,.20);color:#E24B4A;cursor:pointer">Force-expire</button></td></tr>
+        <tr><td style="color:var(--text)">Ben Wallace</td><td><span class="tag" style="background:rgba(55,138,221,.12);color:var(--accent)">finance</span></td><td class="mono">2d ago</td><td class="mono">2h ago</td><td style="text-align:right"><button style="font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:6px;background:rgba(226,75,74,.10);border:1px solid rgba(226,75,74,.20);color:#E24B4A;cursor:pointer">Force-expire</button></td></tr>
       </tbody>
     </table>
   </div>
@@ -967,13 +1018,15 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
       </div>
     </div>
     <div class="panel">
-      <div class="ph"><div><div class="pt">User API · S9</div><div class="ps">Admin-only CRUD · all mutations logged</div></div><span class="pill">ADMIN ONLY</span></div>
+      <div class="ph"><div><div class="pt">User &amp; SCIM API · S9, S13</div><div class="ps">Admin-only CRUD · all mutations logged</div></div><span class="pill">ADMIN ONLY</span></div>
       <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
         <div style="padding:7px 10px;border-radius:8px;background:rgba(7,30,61,.50)"><code class="mono" style="font-size:9.5px;color:var(--accent)">GET /api/users</code> <span class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">— list all users + stats</span></div>
         <div style="padding:7px 10px;border-radius:8px;background:rgba(7,30,61,.50)"><code class="mono" style="font-size:9.5px;color:var(--green)">POST /api/users</code> <span class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">— invite {email,name,role,password}</span></div>
         <div style="padding:7px 10px;border-radius:8px;background:rgba(7,30,61,.50)"><code class="mono" style="font-size:9.5px;color:var(--amber)">PATCH /api/users</code> <span class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">— update {id,role?,active?,name?}</span></div>
+        <div style="padding:7px 10px;border-radius:8px;background:rgba(7,30,61,.50)"><code class="mono" style="font-size:9.5px;color:var(--green)">POST /api/scim/v2/Users</code> <span class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">— Okta/Azure AD provisioning (Bearer token)</span></div>
+        <div style="padding:7px 10px;border-radius:8px;background:rgba(7,30,61,.50)"><code class="mono" style="font-size:9.5px;color:var(--red)">DELETE /api/scim/v2/Users/:id</code> <span class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">— soft-deprovision, revokes sessions instantly</span></div>
       </div>
-      <div class="mono" style="font-size:9px;color:rgba(133,183,235,.28);margin-top:10px;line-height:1.6">Requires x-user-role: admin header (set by JWT middleware). Open mode returns 403 — set NEXTAUTH_SECRET to unlock.</div>
+      <div class="mono" style="font-size:9px;color:rgba(133,183,235,.28);margin-top:10px;line-height:1.6">User API requires x-user-role: admin (JWT middleware). SCIM requires SCIM_BEARER_TOKEN. Open mode returns 403 — set NEXTAUTH_SECRET to unlock.</div>
     </div>
   </div>
 
@@ -1147,27 +1200,268 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
   </div>
 </div>
 
+<!-- ── PAGE: SUBSCRIPTIONS (S12) ───────────────────────────────────────────── -->
+<div id="pg-subscriptions" class="page">
+  <div class="kpis">
+    <div class="kpi"><div class="kl">Active Subscriptions</div><div class="kv">5</div><div class="ks">Across 5 vendors</div></div>
+    <div class="kpi"><div class="kl">Monthly Commit</div><div class="kv">$4<span class="ku">,240</span></div><div class="ks">Fixed seat + plan cost</div></div>
+    <div class="kpi"><div class="kl">Next Renewal</div><div class="kv" style="color:var(--amber)">18<span class="ku">d</span></div><div class="ks">Anthropic Enterprise · Jul 7</div></div>
+    <div class="kpi"><div class="kl">Committed Burn-down</div><div class="kv">34<span class="ku">%</span></div><div class="ks">$17k of $50k annual commit</div></div>
+  </div>
+
+  <div class="panel" style="margin-top:0">
+    <div class="ph"><div><div class="pt">Renewal Calendar</div><div class="ps">Upcoming renewals · next 90 days · S12</div></div><span class="pill" style="background:rgba(201,138,32,.10);color:var(--amber);border-color:rgba(201,138,32,.20)">1 DUE &lt; 30D</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;background:rgba(201,138,32,.05);border:1px solid rgba(201,138,32,.18)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:600">Anthropic Enterprise</div><div class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">Annual · $50,000 committed spend</div></div>
+        <div style="text-align:right"><div class="mono" style="font-size:11px;color:var(--amber);font-weight:700">18 days</div><div class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35)">Jul 7, 2026</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;background:rgba(55,138,221,.04);border:1px solid rgba(133,183,235,.10)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:600">GitHub Copilot Business</div><div class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">Monthly · 18 seats</div></div>
+        <div style="text-align:right"><div class="mono" style="font-size:11px;color:var(--accent);font-weight:700">42 days</div><div class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35)">Jul 31, 2026</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;background:rgba(55,138,221,.04);border:1px solid rgba(133,183,235,.10)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>
+        <div style="flex:1"><div style="font-size:12.5px;font-weight:600">Cursor Pro</div><div class="mono" style="font-size:9px;color:rgba(133,183,235,.40)">Monthly · 12 seats</div></div>
+        <div style="text-align:right"><div class="mono" style="font-size:11px;color:var(--accent);font-weight:700">57 days</div><div class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35)">Aug 15, 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div><div class="pt">Committed Spend Burn-down</div><div class="ps">Anthropic Enterprise · annual commitment · S12</div></div><span class="pill">$50,000 / YR</span></div>
+    <div style="font-size:22px;font-weight:700;color:var(--blue)">$17,068<span style="font-size:12px;font-weight:400;color:var(--muted)"> consumed of $50,000</span></div>
+    <div style="height:8px;background:rgba(133,183,235,.10);border-radius:4px;overflow:hidden;margin:8px 0">
+      <div style="height:100%;width:34%;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--accent))"></div>
+    </div>
+    <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.35)">34% burned · 138 days into 365-day term · pacing slightly under commit (on track)</div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div><div class="pt">Subscriptions</div><div class="ps">Vendor contracts · seats · billing cycle · S12</div></div><span class="pill">5 ACTIVE</span></div>
+    <table class="tbl">
+      <thead><tr><th>VENDOR</th><th>PLAN</th><th>CYCLE</th><th>SEATS</th><th>$/MO</th><th>RENEWAL</th><th>STATUS</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--text);font-weight:600">Anthropic</td><td>Enterprise</td><td class="mono">annual</td><td class="mono">—</td><td class="mono" style="color:var(--text);font-weight:600">$4,167</td><td class="mono">Jul 7, 2026</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">● active</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">GitHub</td><td>Copilot Business</td><td class="mono">monthly</td><td class="mono">18</td><td class="mono" style="color:var(--text);font-weight:600">$342</td><td class="mono">Jul 31, 2026</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">● active</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">Cursor</td><td>Pro</td><td class="mono">monthly</td><td class="mono">12</td><td class="mono" style="color:var(--text);font-weight:600">$240</td><td class="mono">Aug 15, 2026</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">● active</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">OpenAI</td><td>Team</td><td class="mono">monthly</td><td class="mono">8</td><td class="mono" style="color:var(--text);font-weight:600">$200</td><td class="mono">Sep 3, 2026</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">● active</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">AWS</td><td>Bedrock (usage-based)</td><td class="mono">usage</td><td class="mono">—</td><td class="mono" style="color:var(--muted)">~$3.54</td><td class="mono" style="color:var(--muted)">—</td><td><span class="tag" style="background:rgba(55,138,221,.10);color:var(--blue)">○ usage-based</span></td></tr>
+      </tbody>
+    </table>
+    <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.30);margin-top:10px;line-height:1.6">
+      Renewal alerts fire to Slack/HTTP webhook when a subscription is &lt; 30 days from renewal, or actual spend deviates &gt;20% from committed. Manage via Settings → Subscriptions → + Add.
+    </div>
+  </div>
+</div>
+
+<!-- ── PAGE: BUDGET RULES (S16) ────────────────────────────────────────────── -->
+<div id="pg-budgetrules" class="page">
+  <div class="kpis">
+    <div class="kpi"><div class="kl">Active Rules</div><div class="kv">3</div><div class="ks">4 total · 1 paused</div></div>
+    <div class="kpi"><div class="kl">Fired Today</div><div class="kv" style="color:var(--amber)">1</div><div class="ks">executions in last 24h</div></div>
+    <div class="kpi"><div class="kl">Project Budgets</div><div class="kv">4</div><div class="ks">1 over alert threshold</div></div>
+    <div class="kpi"><div class="kl">Last Execution</div><div class="kv" style="font-size:14px">2h ago</div><div class="ks">High-Spend Auto-Scale</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="panel" style="margin-top:0">
+      <div class="ph"><div><div class="pt">Automation Rules</div><div class="ps">IF budget % ≥ threshold THEN execute actions · S16</div></div><span class="pill">3 / 4 ACTIVE</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+        <div style="padding:12px 14px;border-radius:11px;background:rgba(55,138,221,.04);border:1px solid rgba(133,183,235,.10)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:7px;height:7px;border-radius:50%;background:var(--green)"></span><span style="font-size:12.5px;font-weight:600">High-Spend Auto-Scale</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">fired 2h ago</span></div>
+          <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">IF spend ≥ <span style="color:var(--accent)">90%</span> · cooldown 4h</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent);border:1px solid rgba(133,183,235,.15)">Notify Slack</span>
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent);border:1px solid rgba(133,183,235,.15)">Write Config: model_routing.default_model</span>
+          </div>
+        </div>
+        <div style="padding:12px 14px;border-radius:11px;background:rgba(55,138,221,.04);border:1px solid rgba(133,183,235,.10)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:7px;height:7px;border-radius:50%;background:var(--green)"></span><span style="font-size:12.5px;font-weight:600">Finance Early Warning</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">fired 6d ago</span></div>
+          <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">IF spend ≥ <span style="color:var(--accent)">75%</span> · cooldown 24h</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent);border:1px solid rgba(133,183,235,.15)">Notify Webhook</span>
+          </div>
+        </div>
+        <div style="padding:12px 14px;border-radius:11px;background:rgba(55,138,221,.04);border:1px solid rgba(133,183,235,.10)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:7px;height:7px;border-radius:50%;background:var(--green)"></span><span style="font-size:12.5px;font-weight:600">Critical Hard-Stop Alert</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">never fired</span></div>
+          <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.45)">IF spend ≥ <span style="color:var(--accent)">100%</span> · cooldown 1h</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent);border:1px solid rgba(133,183,235,.15)">Notify Slack</span>
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent);border:1px solid rgba(133,183,235,.15)">Log Only</span>
+          </div>
+        </div>
+        <div style="padding:12px 14px;border-radius:11px;background:rgba(133,183,235,.02);border:1px solid rgba(133,183,235,.08);opacity:.55">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:7px;height:7px;border-radius:50%;background:rgba(133,183,235,.3)"></span><span style="font-size:12.5px;font-weight:600">Weekend Throttle (paused)</span></div>
+          <div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.40)">IF spend ≥ <span style="color:var(--accent)">60%</span> · cooldown 12h</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:0">
+      <div class="ph"><div><div class="pt">Recent Executions</div><div class="ps">Last 20 rule firings · S16</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:6px">
+        <div style="padding:10px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--green)">✓</span><span style="font-size:11.5px;font-weight:600">High-Spend Auto-Scale</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">2h ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">Spend: 91.4%</div>
+          <div style="display:flex;gap:4px;margin-top:5px"><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green);font-size:8px">notify slack ✓</span><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green);font-size:8px">config write ✓</span></div>
+        </div>
+        <div style="padding:10px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--green)">✓</span><span style="font-size:11.5px;font-weight:600">Finance Early Warning</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">6d ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">Spend: 76.2%</div>
+          <div style="display:flex;gap:4px;margin-top:5px"><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green);font-size:8px">notify webhook ✓</span></div>
+        </div>
+        <div style="padding:10px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--red)">✕</span><span style="font-size:11.5px;font-weight:600">High-Spend Auto-Scale</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">11d ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">Spend: 92.1%</div>
+          <div style="display:flex;gap:4px;margin-top:5px"><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green);font-size:8px">notify slack ✓</span><span class="tag" style="background:rgba(226,75,74,.10);color:var(--red);font-size:8px">config write ✕</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div><div class="pt">Project Budgets</div><div class="ps">Per-project monthly caps with alert thresholds · S16</div></div><span class="pill">4 CONFIGURED</span></div>
+    <table class="tbl">
+      <thead><tr><th>PROJECT</th><th>MONTHLY CAP</th><th>MTD SPEND</th><th>UTILISATION</th><th>ALERT AT</th><th>HARD STOP</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--text);font-weight:600">platform-shared</td><td class="mono">$150.00</td><td class="mono" style="color:var(--text)">$97.62</td><td><div style="display:flex;align-items:center;gap:6px"><div style="width:60px;height:5px;border-radius:3px;background:rgba(133,183,235,.10);overflow:hidden"><div style="height:100%;width:65%;background:var(--green);border-radius:3px"></div></div><span class="mono" style="font-size:9px;color:var(--green)">65%</span></div></td><td class="mono">80%</td><td><span class="tag" style="background:rgba(55,138,221,.10);color:var(--blue)">warn only</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">legacy-modernization</td><td class="mono">$60.00</td><td class="mono" style="color:var(--text)">$53.32</td><td><div style="display:flex;align-items:center;gap:6px"><div style="width:60px;height:5px;border-radius:3px;background:rgba(133,183,235,.10);overflow:hidden"><div style="height:100%;width:89%;background:var(--amber);border-radius:3px"></div></div><span class="mono" style="font-size:9px;color:var(--amber)">89%</span></div></td><td class="mono">80%</td><td><span class="tag" style="background:rgba(226,75,74,.12);color:var(--red)">HARD STOP</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">rag-search</td><td class="mono">$80.00</td><td class="mono" style="color:var(--text)">$47.33</td><td><div style="display:flex;align-items:center;gap:6px"><div style="width:60px;height:5px;border-radius:3px;background:rgba(133,183,235,.10);overflow:hidden"><div style="height:100%;width:59%;background:var(--green);border-radius:3px"></div></div><span class="mono" style="font-size:9px;color:var(--green)">59%</span></div></td><td class="mono">80%</td><td><span class="tag" style="background:rgba(55,138,221,.10);color:var(--blue)">warn only</span></td></tr>
+        <tr><td style="color:var(--text);font-weight:600">agentic-poc</td><td class="mono">$50.00</td><td class="mono" style="color:var(--text)">$41.13</td><td><div style="display:flex;align-items:center;gap:6px"><div style="width:60px;height:5px;border-radius:3px;background:rgba(133,183,235,.10);overflow:hidden"><div style="height:100%;width:82%;background:var(--amber);border-radius:3px"></div></div><span class="mono" style="font-size:9px;color:var(--amber)">82%</span></div></td><td class="mono">75%</td><td><span class="tag" style="background:rgba(55,138,221,.10);color:var(--blue)">warn only</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── PAGE: WEBHOOKS (S14) ────────────────────────────────────────────────── -->
+<div id="pg-webhooks" class="page">
+  <div class="kpis">
+    <div class="kpi"><div class="kl">Active Webhooks</div><div class="kv">3</div><div class="ks">4 total</div></div>
+    <div class="kpi"><div class="kl">Deliveries (24h)</div><div class="kv">12</div><div class="ks">across all webhooks</div></div>
+    <div class="kpi"><div class="kl">Success Rate</div><div class="kv" style="color:var(--green)">92<span class="ku">%</span></div><div class="ks">last 24h</div></div>
+    <div class="kpi"><div class="kl">Last Delivery</div><div class="kv" style="font-size:14px">4m ago</div><div class="ks">budget_threshold → Slack</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="panel" style="margin-top:0">
+      <div class="ph"><div><div class="pt">Webhook Registry</div><div class="ps">Slack · HTTP · PagerDuty · Teams — HMAC signed, retried up to 3× · S14</div></div><span class="pill">3 / 4 ACTIVE</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+        <div style="padding:11px 13px;border-radius:11px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15)">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="width:24px;height:24px;border-radius:7px;background:rgba(245,158,11,.18);color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:var(--mono)">SL</div>
+            <span style="font-size:12.5px;font-weight:600">#finops Slack channel</span>
+            <span class="tag" style="background:rgba(245,158,11,.15);color:#f59e0b">Slack</span>
+            <span style="color:var(--green);font-size:11px">✓</span>
+          </div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:6px">https://hooks.slack.com/services/T0…/B0…</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent)">Budget Threshold</span>
+            <span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent)">Budget Rule Fired</span>
+          </div>
+        </div>
+        <div style="padding:11px 13px;border-radius:11px;background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.15)">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="width:24px;height:24px;border-radius:7px;background:rgba(96,165,250,.18);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:var(--mono)">WH</div>
+            <span style="font-size:12.5px;font-weight:600">Datadog ingest</span>
+            <span class="tag" style="background:rgba(96,165,250,.15);color:#60a5fa">HTTP</span>
+            <span style="color:var(--green);font-size:11px">✓</span>
+          </div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:6px">https://api.datadoghq.com/intake/…</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent)">all events</span></div>
+        </div>
+        <div style="padding:11px 13px;border-radius:11px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15)">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="width:24px;height:24px;border-radius:7px;background:rgba(34,197,94,.18);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:var(--mono)">PD</div>
+            <span style="font-size:12.5px;font-weight:600">On-call PagerDuty</span>
+            <span class="tag" style="background:rgba(34,197,94,.15);color:#22c55e">PagerDuty</span>
+            <span style="color:var(--green);font-size:11px">✓</span>
+          </div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:6px">https://events.pagerduty.com/v2/enqueue</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent)">Security</span></div>
+        </div>
+        <div style="padding:11px 13px;border-radius:11px;background:rgba(133,183,235,.02);border:1px solid rgba(133,183,235,.08);opacity:.55">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="width:24px;height:24px;border-radius:7px;background:rgba(129,140,248,.18);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;font-family:var(--mono)">TM</div>
+            <span style="font-size:12.5px;font-weight:600">MS Teams (disabled)</span>
+            <span class="tag" style="background:rgba(129,140,248,.15);color:#818cf8">Teams</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:0">
+      <div class="ph"><div><div class="pt">Delivery Log</div><div class="ps">Last 20 deliveries · S14</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:6px">
+        <div style="padding:9px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--green)">✓</span><span style="font-size:11.5px;font-weight:600">#finops Slack channel</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">4m ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">budget_threshold · HTTP 200 · 1063ms</div>
+        </div>
+        <div style="padding:9px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--green)">✓</span><span style="font-size:11.5px;font-weight:600">Datadog ingest</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">4m ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">budget_threshold · HTTP 202 · 211ms</div>
+        </div>
+        <div style="padding:9px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--red)">✕</span><span style="font-size:11.5px;font-weight:600">On-call PagerDuty</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">3h ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">security · HTTP 401 · attempt 3</div>
+          <div class="mono" style="font-size:8.5px;color:var(--red);margin-top:2px">Routing key rejected</div>
+        </div>
+        <div style="padding:9px 12px;border-radius:10px;background:rgba(133,183,235,.03);border:1px solid rgba(133,183,235,.08)">
+          <div style="display:flex;align-items:center;gap:6px"><span style="color:var(--green)">✓</span><span style="font-size:11.5px;font-weight:600">#finops Slack channel</span><span class="mono" style="font-size:8.5px;color:rgba(133,183,235,.35);margin-left:auto">6d ago</span></div>
+          <div class="mono" style="font-size:9px;color:rgba(133,183,235,.40);margin-top:3px">budget_rule · HTTP 200 · 894ms</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph"><div><div class="pt">How It Works</div><div class="ps">HMAC-SHA256 signed · 3-attempt retry with exponential backoff · S14</div></div></div>
+    <div class="g3" style="margin-top:6px">
+      <div style="padding:12px;border-radius:11px;background:rgba(55,138,221,.03);border:1px solid rgba(55,138,221,.10)">
+        <div class="mono" style="font-size:8.5px;color:var(--accent);margin-bottom:4px">SIGN</div>
+        <div style="font-size:11.5px;font-weight:600;margin-bottom:4px">X-Apex-Signature header</div>
+        <div class="mono" style="font-size:9px;color:rgba(133,183,235,.38);line-height:1.5">Every payload is HMAC-SHA256 signed with a per-webhook secret so receivers can verify authenticity.</div>
+      </div>
+      <div style="padding:12px;border-radius:11px;background:rgba(55,138,221,.03);border:1px solid rgba(55,138,221,.10)">
+        <div class="mono" style="font-size:8.5px;color:var(--accent);margin-bottom:4px">RETRY</div>
+        <div style="font-size:11.5px;font-weight:600;margin-bottom:4px">0s · 2s · 8s backoff</div>
+        <div class="mono" style="font-size:9px;color:rgba(133,183,235,.38);line-height:1.5">Up to 3 attempts per event before giving up; every attempt is logged to the delivery log.</div>
+      </div>
+      <div style="padding:12px;border-radius:11px;background:rgba(55,138,221,.03);border:1px solid rgba(55,138,221,.10)">
+        <div class="mono" style="font-size:8.5px;color:var(--accent);margin-bottom:4px">SUBSCRIBE</div>
+        <div style="font-size:11.5px;font-weight:600;margin-bottom:4px">Per-event subscriptions</div>
+        <div class="mono" style="font-size:9px;color:rgba(133,183,235,.38);line-height:1.5">Each webhook picks specific event types (budget_threshold, security, …) or "all events".</div>
+      </div>
+    </div>
+  </div>
+</div>
+
   </div><!-- /content -->
   <footer style="font-family:var(--mono);font-size:9px;text-align:center;padding:6px;color:rgba(133,183,235,.20);border-top:1px solid rgba(133,183,235,.08);flex-shrink:0">
-    APEX Pulse · AI FinOps Platform · Sprint 10 · v10.0.0 · verify pricing at each provider's page
+    APEX Pulse · AI FinOps Platform · Sprint 16 · v16.0.0 · verify pricing at each provider's page
   </footer>
 </div>
 
 <script>
 const META = {
-  overview:      {ic:'▣', title:'Executive Overview',    sub:'June 2026 · Multi-provider · Sprint 10'},
+  overview:      {ic:'▣', title:'Executive Overview',    sub:'June 2026 · Multi-provider · Sprint 16'},
   providers:     {ic:'⬡', title:'Providers',             sub:'5 API providers · 3 seat providers · token & seat billing'},
   teams:         {ic:'◎', title:'Teams & Attribution',   sub:'4 teams · 24 contributors · project drill-down'},
   budget:        {ic:'◫', title:'Budget & Forecast',     sub:'Monthly budget · state machine · config-driven thresholds'},
   optimization:  {ic:'↗', title:'Optimization Insights', sub:'Model routing · cache strategy · arbitrage · S6 config-driven'},
+  forecast:      {ic:'↗', title:'Spend Forecast',         sub:'90-day history · 60-day projection · budget runway · S10'},
+  subscriptions: {ic:'◑', title:'Subscriptions',          sub:'Vendor contracts · renewal calendar · committed spend · S12'},
   effectiveness: {ic:'⟳', title:'Coding Effectiveness',  sub:'3 tools · acceptance rate · seat ROI · config-driven · S6'},
   playground:    {ic:'⚡', title:'API Playground',        sub:'Live Claude calls · real-time cost recording'},
   governance:    {ic:'◉', title:'RBAC & Policies',       sub:'4 roles · 9 permissions · JWT auth · audit trail · S7'},
   alerts:        {ic:'◈', title:'Alerts & Incidents',    sub:'persisted · webhook delivery · auto-resolve · S8'},
-  integrations:  {ic:'⊞', title:'Integrations',          sub:'5 API providers · seat tools · webhooks · S7'},
-  users:         {ic:'◎', title:'User Management',        sub:'invite · role assignment · deactivate · audit trail · S9'},
-  forecast:      {ic:'↗', title:'Spend Forecast',         sub:'90-day history · 60-day projection · budget runway · S10'},
-  settings:      {ic:'⚙', title:'Settings',              sub:'v10.0.0 · 17 live-editable config keys · S6–S10'},
+  budgetrules:   {ic:'⚙', title:'Budget Rules',           sub:'IF/THEN rules · auto config-write · project caps · S16'},
+  webhooks:      {ic:'⊛', title:'Webhooks',               sub:'Slack · HTTP · PagerDuty · Teams · HMAC signed · retry+backoff · S14'},
+  integrations:  {ic:'⊞', title:'Integrations & Key Vault', sub:'AES-256-GCM key vault · test-before-save · 8 providers · S11'},
+  users:         {ic:'◎', title:'User Management',        sub:'invite · bulk CSV · SSO/SCIM · sessions · group mapping · S9, S13'},
+  settings:      {ic:'⚙', title:'Settings',              sub:'v16.0.0 · 18 live-editable config keys · S6–S16'},
 }
 function nav(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'))
@@ -1244,17 +1538,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // ── Integration cards ───────────────────────────────────────────────────────
   try {
     const api = [
-      {id:'AC',label:'Anthropic Claude', desc:'Opus 4.8 · Sonnet 4.6 · Haiku 4.5 — token billing with cache tracking', key:'ANTHROPIC_API_KEY',    color:'#2dd4bf', active:true},
-      {id:'OA',label:'OpenAI',           desc:'GPT-4o · o1 · GPT-4o-mini — token billing',                             key:'OPENAI_API_KEY',      color:'#34d399', active:true},
-      {id:'AZ',label:'Azure OpenAI',     desc:'GPT-4o via Azure — 13% premium vs direct',                                        key:'AZURE_OPENAI_API_KEY',color:'#818cf8', active:false},
-      {id:'AB',label:'AWS Bedrock',      desc:'Claude 3.5 Sonnet via Bedrock — token billing',                                   key:'AWS_ACCESS_KEY_ID',   color:'#f472b6', active:false},
-      {id:'GG',label:'Google Gemini',    desc:'Gemini 2.0 · 1.5 Pro · Flash — token billing',                         key:'GOOGLE_API_KEY',      color:'#4ade80', active:false},
+      {id:'AC',label:'Anthropic Claude', desc:'Opus 4.8 · Sonnet 4.6 · Haiku 4.5 — token billing with cache tracking', key:'ANTHROPIC_API_KEY',    color:'#2dd4bf', active:true,  source:'vault', hint:'4xWz'},
+      {id:'OA',label:'OpenAI',           desc:'GPT-4o · o1 · GPT-4o-mini — token billing',                             key:'OPENAI_API_KEY',      color:'#34d399', active:true,  source:'vault', hint:'9pQk'},
+      {id:'AZ',label:'Azure OpenAI',     desc:'GPT-4o via Azure — 13% premium vs direct',                                        key:'AZURE_OPENAI_API_KEY',color:'#818cf8', active:false, source:'none'},
+      {id:'AB',label:'AWS Bedrock',      desc:'Claude 3.5 Sonnet via Bedrock — token billing',                                   key:'AWS_ACCESS_KEY_ID',   color:'#f472b6', active:false, source:'none'},
+      {id:'GG',label:'Google Gemini',    desc:'Gemini 2.0 · 1.5 Pro · Flash — token billing',                         key:'GOOGLE_API_KEY',      color:'#4ade80', active:false, source:'none'},
     ]
     const other = [
-      {id:'GH',label:'GitHub Copilot', desc:'Seat sync — auto-import seat counts from GitHub org', key:'GITHUB_TOKEN',      color:'#a3a3a3', active:false},
-      {id:'SL',label:'Slack Alerts',   desc:'Incoming webhook — budget + anomaly alerts',          key:'SLACK_WEBHOOK_URL', color:'#f59e0b', active:false},
-      {id:'WH',label:'HTTP Webhook',   desc:'Generic JSON POST — all alert types',                 key:'ALERT_WEBHOOK_URL', color:'#60a5fa', active:false},
+      {id:'GH',label:'GitHub Copilot', desc:'Seat sync — auto-import seat counts from GitHub org', key:'GITHUB_TOKEN',      color:'#a3a3a3', active:false, source:'none'},
+      {id:'SL',label:'Slack Alerts',   desc:'Incoming webhook — budget + anomaly alerts',          key:'SLACK_WEBHOOK_URL', color:'#f59e0b', active:false, source:'none'},
+      {id:'WH',label:'HTTP Webhook',   desc:'Generic JSON POST — all alert types',                 key:'ALERT_WEBHOOK_URL', color:'#60a5fa', active:false, source:'none'},
     ]
+    function srcBadge(source) {
+      if (source === 'vault') return '<span class="mono" style="font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(34,160,107,.12);color:var(--green);border:1px solid rgba(34,160,107,.25)">● VAULT</span>'
+      if (source === 'env')   return '<span class="mono" style="font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(55,138,221,.12);color:var(--blue);border:1px solid rgba(55,138,221,.25)">● ENV</span>'
+      return '<span class="mono" style="font-size:8px;padding:2px 7px;border-radius:10px;background:rgba(133,183,235,.06);color:rgba(133,183,235,.35);border:1px solid rgba(133,183,235,.12)">○ NOT SET</span>'
+    }
     function card(i) {
       var bg   = i.active ? i.color + '08' : 'rgba(133,183,235,.02)'
       var bc   = i.active ? i.color + '20' : 'rgba(133,183,235,.08)'
@@ -1267,12 +1566,13 @@ document.addEventListener('DOMContentLoaded', function() {
       return '<div style="display:flex;align-items:start;gap:12px;padding:11px 13px;border-radius:12px;margin-bottom:7px;border:1px solid ' + bc + ';background:' + bg + '">'
         + '<div style="width:36px;height:36px;border-radius:10px;background:' + avbg + ';color:' + avc + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--mono);border:1px solid ' + bdr + '">' + i.id + '</div>'
         + '<div style="flex:1;min-width:0">'
-          + '<div style="display:flex;align-items:center;gap:8px">'
+          + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
             + '<div style="font-size:12.5px;font-weight:600;color:' + (i.active ? 'var(--text)' : 'rgba(235,244,255,.45)') + '">' + i.label + '</div>'
+            + srcBadge(i.source)
             + stat
           + '</div>'
           + '<div class="mono" style="font-size:9.5px;color:rgba(133,183,235,.38);margin-top:2px">' + i.desc + '</div>'
-          + '<div class="mono" style="font-size:8.5px;color:rgba(133,183,235,.28);margin-top:3px">' + (i.active ? i.key : 'Set ' + i.key + ' in .env.local') + '</div>'
+          + '<div class="mono" style="font-size:8.5px;color:rgba(133,183,235,.28);margin-top:3px">' + (i.source === 'vault' ? 'Vault key: ●●●●' + i.hint : 'Connect via vault, or set ' + i.key + ' in .env.local') + '</div>'
         + '</div>'
       + '</div>'
     }
@@ -1296,6 +1596,11 @@ document.addEventListener('DOMContentLoaded', function() {
       {cat:'Effectiveness', k:'eff.accept_bench',            v:'0.28',   d:'Industry benchmark accept rate (0–1)'},
       {cat:'Effectiveness', k:'eff.survival_bench',          v:'0.65',   d:'Code survival rate benchmark (0–1)'},
       {cat:'Effectiveness', k:'eff.roi_target',              v:'1.5',    d:'Minimum acceptable ROI multiplier'},
+      {cat:'App',           k:'app.rate_limit_rpm',          v:'120',    d:'API rate limit — requests/min/IP'},
+      {cat:'App',           k:'app.max_export_rows',         v:'50000',  d:'Max rows returned by /api/export'},
+      {cat:'App',           k:'app.session_timeout_hours',   v:'24',     d:'JWT session lifetime in hours'},
+      {cat:'App',           k:'app.allowed_origins',         v:'',       d:'Extra CORS origins (empty = same-origin)'},
+      {cat:'Auth',          k:'auth.mfa_required',           v:'false',  d:'Require MFA for all credentials-login users · S13'},
     ]
     var curCat2 = '', html2 = ''
     cfgKeys.forEach(function(r) {
