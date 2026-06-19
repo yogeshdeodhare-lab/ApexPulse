@@ -295,6 +295,27 @@ model WebhookDelivery {
   @@index([sentAt])
 }
 
+// ─── S15: Integration Marketplace ─────────────────────────────────────────────
+
+model Integration {
+  id              String    @id @default(uuid())
+  provider        String    @unique // jira | linear | datadog | grafana | servicenow
+  config          String    // JSON — non-secret fields (baseUrl, email, projectKey, site, teamId, ...)
+  encryptedSecret String?   // AES-256-GCM encrypted token/API key/password
+  active          Boolean   @default(true)
+  testedAt        DateTime?
+  testOk          Boolean   @default(false)
+  lastSyncAt      DateTime?
+  lastSyncStatus  String?   // ok | error
+  lastSyncError   String?
+  lastSyncCount   Int?
+  createdBy       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([provider])
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 model CopilotEffectivenessSnapshot {

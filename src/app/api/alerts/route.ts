@@ -3,6 +3,7 @@ import { prisma }             from '@/lib/db'
 import { getConfigNum }       from '@/lib/config'
 import { fireAlertWebhook }   from '@/lib/webhooks'
 import { dispatchWebhooks }   from '@/lib/webhook-delivery'
+import { dispatchTickets }    from '@/lib/integrations/dispatch'
 
 export const dynamic = 'force-dynamic'
 
@@ -145,6 +146,8 @@ export async function GET() {
           title: c.title, message: c.message, severity: c.severity,
           value: c.value, threshold: c.threshold, source: c.source,
         })
+        // Connected integrations (S15) — Jira/Linear issues, ServiceNow incidents for critical alerts
+        void dispatchTickets({ title: c.title, message: c.message, severity: c.severity, source: c.source })
       }
     }
 

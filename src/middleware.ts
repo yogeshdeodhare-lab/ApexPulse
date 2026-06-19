@@ -13,6 +13,7 @@ const PUBLIC_PATHS = new Set([
   '/api/health',        // uptime checks — no auth needed
   '/api/scim',          // S13 — SCIM provisioning authenticates via its own Bearer token
   '/api/settings',      // S13 — login/forgot-password pages read SSO feature flags pre-auth; no secrets exposed
+  '/api/metrics',       // S15 — Grafana/Prometheus scrapes this with its own bearer token, not a session
   '/demo.html',          // standalone demo
 ])
 

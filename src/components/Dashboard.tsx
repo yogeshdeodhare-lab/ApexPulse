@@ -21,6 +21,7 @@ import SubscriptionsPage  from './pages/SubscriptionsPage'
 import BudgetRulesPage    from './pages/BudgetRulesPage'
 import WebhooksPage       from './pages/WebhooksPage'
 import AccountPage        from './pages/AccountPage'
+import IntegrationMarketplacePage from './pages/IntegrationMarketplacePage'
 import StubPage           from './pages/StubPage'
 
 // ── Page metadata ─────────────────────────────────────────────────────────────
@@ -43,6 +44,7 @@ const PAGE_META: Record<PageId, { title: string; sub: string; icon: string }> = 
   users:         { title: 'User Management',          icon: '◎', sub: 'invite · bulk CSV · SSO/SCIM · sessions · group mapping · S9, S13' },
   settings:      { title: 'Settings',                icon: '⚙', sub: 'v16.0.0 · 18 live-editable config keys · S6–S16' },
   account:       { title: 'My Account',               icon: '◇', sub: 'self-service password · TOTP MFA enrollment · S13' },
+  marketplace:   { title: 'Integration Marketplace',  icon: '◆', sub: 'Jira · Linear · Datadog · Grafana · ServiceNow · ticket-on-alert · S15' },
 }
 
 // ── Mobile bottom nav pages ───────────────────────────────────────────────────
@@ -255,6 +257,8 @@ export default function Dashboard() {
         return <WebhooksPage />
       case 'account':
         return <AccountPage />
+      case 'marketplace':
+        return <IntegrationMarketplacePage />
       default:
         return <StubPage pageId={page} />
     }

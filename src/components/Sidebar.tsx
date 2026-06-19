@@ -7,7 +7,7 @@ export type PageId =
   | 'budget' | 'optimization' | 'forecast' | 'subscriptions'
   | 'effectiveness' | 'demo'
   | 'governance' | 'alerts' | 'budgetRules' | 'webhooks'
-  | 'integrations' | 'settings' | 'users' | 'account'
+  | 'integrations' | 'marketplace' | 'settings' | 'users' | 'account'
 
 interface NavItem {
   id: PageId
@@ -54,6 +54,7 @@ const SECTIONS: { title: string; icon: string; items: NavItem[] }[] = [
     title: 'ADMIN', icon: '⚙',
     items: [
       { id: 'integrations', label: 'Integrations' },
+      { id: 'marketplace',  label: 'Marketplace' },
       { id: 'users',        label: 'Users' },
       { id: 'settings',     label: 'Settings' },
       { id: 'account',      label: 'My Account' },
@@ -77,6 +78,7 @@ const PAGE_ICON: Record<PageId, string> = {
   budgetRules:   '⚙',
   webhooks:      '⊛',
   integrations:  '⊞',
+  marketplace:   '◆',
   users:         '◎',
   settings:      '⚙',
   account:       '◇',
