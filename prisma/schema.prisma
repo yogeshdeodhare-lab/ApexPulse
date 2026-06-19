@@ -316,6 +316,44 @@ model Integration {
   @@index([provider])
 }
 
+// ─── S17: AI-Powered Optimization Engine ──────────────────────────────────────
+
+model Recommendation {
+  id               String    @id @default(uuid())
+  type             String    // model_routing | cache_strategy | seat_roi | provider_arbitrage | token_efficiency | spend_anomaly | unused_seats
+  title            String
+  description      String
+  rationale        String?   // Claude Haiku's narrative reasoning
+  estimatedSavings  Float
+  confidence       String    // high | medium | low
+  status           String    @default("active") // active | applied | dismissed | expired
+  actionType       String    // config_write | create_ticket | manual
+  actionPayload    String?   // JSON, e.g. {"key":"...", "value":"..."}
+  sourceId         String?   // links back to the deterministic opportunity id, if any
+  appliedAt        DateTime?
+  appliedBy        String?
+  dismissedAt      DateTime?
+  dismissedUntil   DateTime?
+  roiActualSavings Float?
+  roiMeasuredAt    DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status])
+  @@index([type])
+}
+
+model RecommendationRun {
+  id           String   @id @default(uuid())
+  runAt        DateTime @default(now())
+  model        String
+  candidatesIn Int
+  picked       Int
+  rawNotes     String?  // Claude's freeform anomaly callouts not tied to a specific recommendation
+
+  @@index([runAt])
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 model CopilotEffectivenessSnapshot {

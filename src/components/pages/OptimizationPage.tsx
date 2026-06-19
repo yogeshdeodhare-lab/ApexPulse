@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { KpiCard, Panel, mono, fmtUSD } from '@/components/ui'
-import type { OptimizationOpportunity, OptType, Priority } from '@/app/api/optimization/route'
+import type { OptimizationOpportunity, OptType, Priority } from '@/lib/optimization-engine'
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -217,6 +217,177 @@ function CategoryStrip({ byCategory, active, onSelect }: {
   )
 }
 
+// ── AI Recommendations (S17) ──────────────────────────────────────────────────
+
+interface Recommendation {
+  id:               string
+  type:             string
+  title:            string
+  description:      string
+  rationale:        string | null
+  estimatedSavings: number
+  confidence:       string
+  status:           string
+  actionType:       string
+  appliedAt:        string | null
+  dismissedAt:      string | null
+  roiActualSavings: number | null
+  roiMeasuredAt:    string | null
+}
+
+const CONFIDENCE_COLOR: Record<string, string> = { high: '#22A06B', medium: '#C98A20', low: 'rgba(133,183,235,0.45)' }
+
+function relTime(iso: string | null): string {
+  if (!iso) return 'Never'
+  const diff = Date.now() - new Date(iso).getTime()
+  if (diff < 60_000)    return 'just now'
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`
+  return `${Math.floor(diff / 86_400_000)}d ago`
+}
+
+function RecommendationCard({ rec, onAction }: { rec: Recommendation; onAction: () => void }) {
+  const [busy, setBusy] = useState<'apply' | 'dismiss' | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  async function apply() {
+    setBusy('apply'); setError(null)
+    const res = await fetch(`/api/ai/recommendations/${rec.id}/apply`, { method: 'POST' })
+    const d = await res.json()
+    setBusy(null)
+    if (!res.ok) { setError(d.error ?? 'Apply failed'); return }
+    onAction()
+  }
+
+  async function dismiss() {
+    setBusy('dismiss')
+    await fetch(`/api/ai/recommendations/${rec.id}/dismiss`, { method: 'POST' })
+    setBusy(null)
+    onAction()
+  }
+
+  const actionLabel = rec.actionType === 'config_write' ? 'Apply (writes config)' : rec.actionType === 'create_ticket' ? 'Apply (create ticket)' : 'Mark applied'
+
+  return (
+    <div className="rounded-[12px] p-4" style={{ background: 'rgba(13,40,69,0.80)', border: '1px solid rgba(133,183,235,0.13)' }}>
+      <div className="flex items-start gap-2 flex-wrap mb-2">
+        <span className={`${mono} text-[9px] font-bold px-2 py-0.5 rounded-full`} style={{ background: 'rgba(133,183,235,0.10)', color: '#85B7EB', border: '1px solid rgba(133,183,235,0.20)' }}>
+          {rec.type.replace(/_/g, ' ')}
+        </span>
+        <span className={`${mono} text-[9px] font-bold px-2 py-0.5 rounded-full`} style={{ color: CONFIDENCE_COLOR[rec.confidence] ?? '#85B7EB', background: `${CONFIDENCE_COLOR[rec.confidence] ?? '#85B7EB'}18`, border: `1px solid ${CONFIDENCE_COLOR[rec.confidence] ?? '#85B7EB'}30` }}>
+          {rec.confidence} confidence
+        </span>
+        <span className={`${mono} text-[11px] font-bold ml-auto`} style={{ color: '#22A06B' }}>{fmtUSD(rec.estimatedSavings)}/mo</span>
+      </div>
+      <h4 className="text-[12.5px] font-semibold mb-1" style={{ color: '#EBF4FF' }}>{rec.title}</h4>
+      <p className="text-[10.5px] leading-relaxed mb-2" style={{ color: 'rgba(235,244,255,0.55)' }}>{rec.description}</p>
+      {rec.rationale && (
+        <p className={`${mono} text-[10px] italic mb-3`} style={{ color: 'rgba(133,183,235,0.50)' }}>
+          &ldquo;{rec.rationale}&rdquo; — Claude Haiku
+        </p>
+      )}
+      {error && (
+        <div className={`${mono} text-[9.5px] mb-2 px-2.5 py-1.5 rounded-[6px]`} style={{ background: 'rgba(226,75,74,0.10)', color: '#E24B4A' }}>{error}</div>
+      )}
+      <div className="flex gap-2">
+        <button onClick={apply} disabled={!!busy}
+          className={`${mono} text-[10px] px-3 py-1.5 rounded-[7px] font-semibold transition-all disabled:opacity-40`}
+          style={{ background: 'rgba(34,160,107,0.15)', border: '1px solid rgba(34,160,107,0.30)', color: '#22A06B' }}>
+          {busy === 'apply' ? 'Applying…' : actionLabel}
+        </button>
+        <button onClick={dismiss} disabled={!!busy}
+          className={`${mono} text-[10px] px-3 py-1.5 rounded-[7px] transition-all disabled:opacity-40`}
+          style={{ background: 'rgba(133,183,235,0.06)', border: '1px solid rgba(133,183,235,0.14)', color: 'rgba(133,183,235,0.55)' }}>
+          {busy === 'dismiss' ? '…' : 'Dismiss'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AiRecommendationsPanel() {
+  const [recs,      setRecs]      = useState<Recommendation[]>([])
+  const [history,   setHistory]   = useState<Recommendation[]>([])
+  const [lastRunAt, setLastRunAt] = useState<string | null>(null)
+  const [loading,   setLoading]   = useState(true)
+  const [refreshing,setRefreshing]= useState(false)
+  const [refreshErr,setRefreshErr]= useState<string | null>(null)
+
+  async function load() {
+    setLoading(true)
+    const d = await fetch('/api/ai/recommendations').then(r => r.json())
+    if (Array.isArray(d.recommendations)) setRecs(d.recommendations)
+    if (Array.isArray(d.history)) setHistory(d.history)
+    setLastRunAt(d.lastRunAt ?? null)
+    setRefreshErr(d.refreshError ?? null)
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [])
+
+  async function refresh() {
+    setRefreshing(true); setRefreshErr(null)
+    const res = await fetch('/api/ai/recommendations/refresh', { method: 'POST' })
+    const d = await res.json()
+    if (!res.ok) setRefreshErr(d.error ?? 'Refresh failed')
+    setRefreshing(false)
+    load()
+  }
+
+  return (
+    <Panel title="AI Recommendations" badge={`${recs.length} ACTIVE`}
+      sub={`Claude Haiku curates the opportunities below + scans for spend anomalies · refreshes every 6h · last run ${relTime(lastRunAt)}`}>
+      <div className="flex justify-end mb-3">
+        <button onClick={refresh} disabled={refreshing}
+          className={`${mono} text-[10px] px-3 py-1.5 rounded-[7px] font-semibold transition-all disabled:opacity-50`}
+          style={{ background: 'rgba(248,161,0,0.12)', border: '1px solid rgba(248,161,0,0.25)', color: '#F8A100' }}>
+          {refreshing ? '…analyzing' : '⚡ Refresh Analysis'}
+        </button>
+      </div>
+
+      {refreshErr && (
+        <div className={`${mono} text-[10.5px] mb-3 px-3 py-2 rounded-[8px]`} style={{ background: 'rgba(226,75,74,0.10)', color: '#E24B4A' }}>
+          {refreshErr}
+        </div>
+      )}
+
+      {loading ? (
+        <div className={`${mono} text-[11px] text-center py-8`} style={{ color: 'rgba(133,183,235,0.40)' }}>Loading…</div>
+      ) : recs.length === 0 ? (
+        <div className={`${mono} text-[10.5px] text-center py-8`} style={{ color: 'rgba(133,183,235,0.35)' }}>
+          No active recommendations — Claude found nothing actionable beyond what&apos;s already optimal, or hasn&apos;t run yet.
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-3">
+          {recs.map(r => <RecommendationCard key={r.id} rec={r} onAction={load} />)}
+        </div>
+      )}
+
+      {history.length > 0 && (
+        <div className="mt-4 pt-3" style={{ borderTop: '1px solid rgba(133,183,235,0.08)' }}>
+          <div className={`${mono} text-[9px] uppercase tracking-wider mb-2`} style={{ color: 'rgba(133,183,235,0.35)' }}>Recent history</div>
+          <div className="space-y-1.5">
+            {history.slice(0, 6).map(h => (
+              <div key={h.id} className="flex items-center gap-2 text-[10.5px]">
+                <span style={{ color: h.status === 'applied' ? '#22A06B' : h.status === 'dismissed' ? 'rgba(133,183,235,0.40)' : '#C98A20' }}>
+                  {h.status === 'applied' ? '✓' : h.status === 'dismissed' ? '○' : '◐'}
+                </span>
+                <span className="flex-1 truncate" style={{ color: 'rgba(235,244,255,0.55)' }}>{h.title}</span>
+                {h.roiActualSavings != null && (
+                  <span className={`${mono} text-[9.5px]`} style={{ color: h.roiActualSavings >= 0 ? '#22A06B' : '#E24B4A' }}>
+                    actual: {fmtUSD(h.roiActualSavings)}/mo
+                  </span>
+                )}
+                <span className={`${mono} text-[9px]`} style={{ color: 'rgba(133,183,235,0.30)' }}>{h.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </Panel>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 interface OptData {
@@ -288,6 +459,8 @@ export default function OptimizationPage() {
           sub={`Generated ${new Date(data.generatedAt).toLocaleTimeString()}`}
         />
       </div>
+
+      <AiRecommendationsPanel />
 
       {/* Category filter */}
       <Panel title="Optimization Opportunities" badge={`${data.totalOpportunities} IDENTIFIED`}
