@@ -83,10 +83,9 @@ export async function GET() {
     }
   }
 
-  const DAY_LABELS = ['S','M','T','W','T','F','S']
   const dailyTrend = Array.from(dayMap.entries()).map(([dateStr, v]) => {
-    const d = new Date(dateStr)
-    return { date: DAY_LABELS[d.getDay()], ...v }
+    const [, m, day] = dateStr.split('-')
+    return { date: `${parseInt(m, 10)}/${parseInt(day, 10)}`, ...v }
   })
 
   // ── Provider mix (for donut) ──────────────────────────────────────────────
