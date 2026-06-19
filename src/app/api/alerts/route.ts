@@ -4,6 +4,7 @@ import { getConfigNum }       from '@/lib/config'
 import { fireAlertWebhook }   from '@/lib/webhooks'
 import { dispatchWebhooks }   from '@/lib/webhook-delivery'
 import { dispatchTickets }    from '@/lib/integrations/dispatch'
+import { sendPushToAll }      from '@/lib/push'
 
 export const dynamic = 'force-dynamic'
 
@@ -148,6 +149,10 @@ export async function GET() {
         })
         // Connected integrations (S15) — Jira/Linear issues, ServiceNow incidents for critical alerts
         void dispatchTickets({ title: c.title, message: c.message, severity: c.severity, source: c.source })
+        // Browser push (S19) — budget alerts (any severity) + critical incidents
+        if (c.type === 'budget_threshold' || c.severity === 'critical') {
+          void sendPushToAll({ title: c.title, body: c.message, tag: c.type, url: '/' })
+        }
       }
     }
 

@@ -178,6 +178,109 @@ function MfaPanel({ initialEnabled }: { initialEnabled: boolean }) {
   )
 }
 
+// ── Push notifications (S19) ────────────────────────────────────────────────
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const raw = atob(base64)
+  const arr = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+  return arr
+}
+
+function PushPanel() {
+  const [supported, setSupported] = useState(true)
+  const [permission, setPermission] = useState<NotificationPermission>('default')
+  const [subscribed, setSubscribed] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+
+  useEffect(() => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+      setSupported(false)
+      return
+    }
+    setPermission(Notification.permission)
+    navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription()).then(sub => setSubscribed(!!sub))
+  }, [])
+
+  async function enable() {
+    setBusy(true); setMsg(null)
+    try {
+      const perm = await Notification.requestPermission()
+      setPermission(perm)
+      if (perm !== 'granted') { setMsg({ ok: false, text: 'Permission denied — enable notifications for this site in your browser settings.' }); return }
+
+      const { publicKey } = await fetch('/api/push/vapid-key').then(r => r.json())
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      })
+      await fetch('/api/push/subscribe', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(sub.toJSON()),
+      })
+      setSubscribed(true)
+      setMsg({ ok: true, text: 'Push notifications enabled on this device.' })
+    } catch (e) {
+      setMsg({ ok: false, text: e instanceof Error ? e.message : 'Could not enable push notifications' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function disable() {
+    setBusy(true); setMsg(null)
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.getSubscription()
+      if (sub) {
+        await fetch(`/api/push/subscribe?endpoint=${encodeURIComponent(sub.endpoint)}`, { method: 'DELETE' })
+        await sub.unsubscribe()
+      }
+      setSubscribed(false)
+      setMsg({ ok: true, text: 'Push notifications disabled on this device.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Panel title="Push Notifications" sub="Budget alerts and critical incidents — delivered to this browser/device · S19">
+      <div className="mt-2 max-w-sm space-y-3">
+        {!supported ? (
+          <p className={`${mono} text-[10.5px]`} style={{ color: 'rgba(133,183,235,0.45)' }}>Not supported in this browser.</p>
+        ) : subscribed ? (
+          <>
+            <div className={`${mono} text-[10.5px] px-3 py-2 rounded-[8px]`} style={{ background: 'rgba(34,160,107,0.10)', color: '#22A06B' }}>
+              ✓ Enabled on this device
+            </div>
+            <button onClick={disable} disabled={busy}
+              className={`${mono} text-[11px] px-4 py-2 rounded-[9px] font-semibold transition-all disabled:opacity-50`}
+              style={{ background: 'rgba(226,75,74,0.12)', color: '#F28B82', border: '1px solid rgba(226,75,74,0.22)' }}>
+              {busy ? 'Disabling…' : 'Disable'}
+            </button>
+          </>
+        ) : (
+          <button onClick={enable} disabled={busy || permission === 'denied'}
+            className={`${mono} text-[11px] px-4 py-2 rounded-[9px] font-semibold transition-all disabled:opacity-50`}
+            style={{ background: 'rgba(55,138,221,0.20)', color: '#85B7EB', border: '1px solid rgba(133,183,235,0.25)' }}>
+            {busy ? 'Enabling…' : permission === 'denied' ? 'Blocked — check browser settings' : 'Enable push notifications'}
+          </button>
+        )}
+        {msg && (
+          <div className={`${mono} text-[10.5px] px-3 py-2 rounded-[8px]`}
+            style={{ background: msg.ok ? 'rgba(34,160,107,0.10)' : 'rgba(226,75,74,0.10)', color: msg.ok ? '#22A06B' : '#E24B4A' }}>
+            {msg.text}
+          </div>
+        )}
+      </div>
+    </Panel>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function AccountPage() {
@@ -205,6 +308,7 @@ export default function AccountPage() {
         </div>
       )}
       {!profile.isEnvAdmin && <MfaPanel initialEnabled={profile.mfaEnabled} />}
+      <PushPanel />
     </div>
   )
 }

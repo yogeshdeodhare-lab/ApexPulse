@@ -1,0 +1,17 @@
+{
+  "name": "APEX Pulse — AI FinOps Intelligence Layer",
+  "short_name": "APEX Pulse",
+  "description": "Multi-provider AI cost observability, attribution, budget management and spend forecasting",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#071E3D",
+  "theme_color": "#185FA5",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

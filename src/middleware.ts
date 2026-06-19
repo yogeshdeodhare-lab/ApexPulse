@@ -15,6 +15,9 @@ const PUBLIC_PATHS = new Set([
   '/api/settings',      // S13 — login/forgot-password pages read SSO feature flags pre-auth; no secrets exposed
   '/api/metrics',       // S15 — Grafana/Prometheus scrapes this with its own bearer token, not a session
   '/demo.html',          // standalone demo
+  '/manifest.json',     // S19 — PWA manifest, fetched by the browser before login
+  '/sw.js',             // S19 — service worker registers on every page, including /login
+  '/icon.svg',          // S19 — PWA icon
 ])
 
 function isPublic(pathname: string): boolean {
@@ -23,6 +26,7 @@ function isPublic(pathname: string): boolean {
   if (pathname.startsWith('/api/scim/')) return true
   if (pathname.startsWith('/_next/')) return true
   if (pathname.startsWith('/favicon')) return true
+  if (pathname.startsWith('/icons/')) return true // S19 — PWA icons
   return false
 }
 

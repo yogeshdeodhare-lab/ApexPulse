@@ -23,6 +23,7 @@ import WebhooksPage       from './pages/WebhooksPage'
 import AccountPage        from './pages/AccountPage'
 import IntegrationMarketplacePage from './pages/IntegrationMarketplacePage'
 import StubPage           from './pages/StubPage'
+import OfflineBanner, { markSynced } from './OfflineBanner'
 
 // ── Page metadata ─────────────────────────────────────────────────────────────
 
@@ -185,6 +186,7 @@ export default function Dashboard() {
   const fetchStats = useCallback(async () => {
     const res = await fetch('/api/stats')
     setStats(await res.json())
+    markSynced()
   }, [])
 
   const fetchUsage = useCallback(async () => {
@@ -266,6 +268,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
+      <OfflineBanner />
 
       {/* Mobile overlay backdrop */}
       {mobileOpen && (

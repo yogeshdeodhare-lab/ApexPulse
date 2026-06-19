@@ -354,6 +354,21 @@ model RecommendationRun {
   @@index([runAt])
 }
 
+// ─── S19: Mobile / PWA — Web Push ──────────────────────────────────────────────
+
+model WebPushSubscription {
+  id        String   @id @default(uuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userId    String?
+  userEmail String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 model CopilotEffectivenessSnapshot {
