@@ -12,6 +12,7 @@ function callerEmail(req: NextRequest) { return req.headers.get('x-user-email') 
 const USER_SELECT = {
   id: true, email: true, name: true, role: true,
   active: true, createdAt: true, lastLoginAt: true,
+  ssoProvider: true, mfaEnabled: true,
 } as const
 
 export async function GET(req: NextRequest) {

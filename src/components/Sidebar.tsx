@@ -7,7 +7,7 @@ export type PageId =
   | 'budget' | 'optimization' | 'forecast' | 'subscriptions'
   | 'effectiveness' | 'demo'
   | 'governance' | 'alerts' | 'budgetRules' | 'webhooks'
-  | 'integrations' | 'settings' | 'users'
+  | 'integrations' | 'settings' | 'users' | 'account'
 
 interface NavItem {
   id: PageId
@@ -56,6 +56,7 @@ const SECTIONS: { title: string; icon: string; items: NavItem[] }[] = [
       { id: 'integrations', label: 'Integrations' },
       { id: 'users',        label: 'Users' },
       { id: 'settings',     label: 'Settings' },
+      { id: 'account',      label: 'My Account' },
     ],
   },
 ]
@@ -78,6 +79,7 @@ const PAGE_ICON: Record<PageId, string> = {
   integrations:  '⊞',
   users:         '◎',
   settings:      '⚙',
+  account:       '◇',
 }
 
 // APEX Pulse™ ECG mark SVG

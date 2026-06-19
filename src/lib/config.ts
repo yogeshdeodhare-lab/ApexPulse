@@ -31,6 +31,9 @@ export const CONFIG_SCHEMA: Record<string, { default: string; description: strin
   'app.max_export_rows':            { default: '50000', description: 'Maximum rows returned by /api/export',                     category: 'app' },
   'app.session_timeout_hours':      { default: '24',    description: 'JWT session lifetime in hours',                            category: 'app' },
   'app.allowed_origins':            { default: '',      description: 'Comma-separated extra CORS origins (empty = same-origin)', category: 'app' },
+
+  // Auth — S13
+  'auth.mfa_required':              { default: 'false', description: 'Require MFA for credentials-login users (SSO users are governed by the IdP)', category: 'auth' },
 }
 
 // ── In-memory cache (per process, 60 s TTL) ──────────────────────────────────

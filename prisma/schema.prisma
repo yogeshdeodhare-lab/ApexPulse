@@ -82,8 +82,55 @@ model User {
   updatedAt    DateTime  @updatedAt
   lastLoginAt  DateTime?
 
+  // ─── S13: SSO / SCIM / MFA ────────────────────────────────────────────────
+  externalId   String?   // SCIM externalId from the IdP (Okta/Azure AD user id)
+  ssoProvider  String?   // oidc | github | scim | null (credentials)
+  mfaSecret    String?   // AES-256-GCM encrypted TOTP secret (vault.ts)
+  mfaEnabled   Boolean   @default(false)
+
+  sessions     UserSession[]
+  resetTokens  PasswordResetToken[]
+
   @@index([email])
   @@index([role])
+  @@index([externalId])
+}
+
+// ─── S13: Advanced User Management & SSO ──────────────────────────────────────
+
+model UserSession {
+  id         String    @id @default(uuid()) // == JWT `sid` claim
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent  String?
+  ipAddress  String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  revokedAt  DateTime?
+
+  @@index([userId])
+  @@index([revokedAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model GroupRoleMapping {
+  id        String   @id @default(uuid())
+  idpGroup  String   @unique // e.g. "finops-admins"
+  role      String            // viewer | manager | finance | admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ─── S6: Compliance audit trail ───────────────────────────────────────────────

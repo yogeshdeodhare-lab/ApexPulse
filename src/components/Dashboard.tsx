@@ -20,6 +20,7 @@ import ForecastPage       from './pages/ForecastPage'
 import SubscriptionsPage  from './pages/SubscriptionsPage'
 import BudgetRulesPage    from './pages/BudgetRulesPage'
 import WebhooksPage       from './pages/WebhooksPage'
+import AccountPage        from './pages/AccountPage'
 import StubPage           from './pages/StubPage'
 
 // ── Page metadata ─────────────────────────────────────────────────────────────
@@ -39,8 +40,9 @@ const PAGE_META: Record<PageId, { title: string; sub: string; icon: string }> = 
   budgetRules:   { title: 'Budget Rules',            icon: '⚙', sub: 'IF/THEN rules · auto config-write · project caps · S16' },
   webhooks:      { title: 'Webhooks',                 icon: '⊛', sub: 'Slack · HTTP · PagerDuty · Teams · HMAC signed · retry+backoff · S14' },
   integrations:  { title: 'Integrations & Key Vault',icon: '⊞', sub: 'AES-256-GCM key vault · test-before-save · 8 providers · S11' },
-  users:         { title: 'User Management',          icon: '◎', sub: 'invite · role assignment · deactivate · S9' },
-  settings:      { title: 'Settings',                icon: '⚙', sub: 'v16.0.0 · 17 live-editable config keys · S6–S16' },
+  users:         { title: 'User Management',          icon: '◎', sub: 'invite · bulk CSV · SSO/SCIM · sessions · group mapping · S9, S13' },
+  settings:      { title: 'Settings',                icon: '⚙', sub: 'v16.0.0 · 18 live-editable config keys · S6–S16' },
+  account:       { title: 'My Account',               icon: '◇', sub: 'self-service password · TOTP MFA enrollment · S13' },
 }
 
 // ── Mobile bottom nav pages ───────────────────────────────────────────────────
@@ -251,6 +253,8 @@ export default function Dashboard() {
         return <BudgetRulesPage />
       case 'webhooks':
         return <WebhooksPage />
+      case 'account':
+        return <AccountPage />
       default:
         return <StubPage pageId={page} />
     }

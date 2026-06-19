@@ -1,8 +1,9 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { mono } from '@/components/ui'
 
 // ── Inner form — uses useSearchParams, must be inside <Suspense> ─────────────
@@ -13,19 +14,33 @@ function LoginForm() {
 
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
+  const [code,      setCode]     = useState('')
+  const [needsMfa,  setNeedsMfa] = useState(false)
   const [error,    setError]    = useState<string | null>(null)
   const [loading,  setLoading]  = useState(false)
   const [showHint, setShowHint] = useState(false)
+  const [sso, setSso] = useState<{ enabled: boolean; name: string }>({ enabled: false, name: 'SSO' })
 
   const githubEnabled = process.env.NEXT_PUBLIC_GITHUB_OAUTH_ENABLED === '1'
+
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => {
+      if (d.sso) setSso(d.sso)
+    }).catch(() => {})
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const res = await signIn('credentials', { email, password, callbackUrl, redirect: false })
+    const res = await signIn('credentials', { email, password, code, callbackUrl, redirect: false })
     setLoading(false)
-    if (res?.error) {
+    if (res?.error === 'MFA_REQUIRED') {
+      setNeedsMfa(true)
+      setError(code ? 'Invalid authenticator code.' : 'Enter your 6-digit authenticator code.')
+    } else if (res?.error === 'MFA_SETUP_REQUIRED') {
+      setError('MFA is required for this account but has not been set up yet. Contact an admin.')
+    } else if (res?.error) {
       setError('Invalid email or password.')
     } else if (res?.ok) {
       window.location.href = callbackUrl
@@ -150,6 +165,37 @@ function LoginForm() {
               />
             </div>
 
+            {/* Authenticator code — revealed only after the server signals MFA is required */}
+            {needsMfa && (
+              <div>
+                <label
+                  className={`${mono} text-[9.5px] tracking-[0.10em] uppercase block mb-1.5`}
+                  style={{ color: 'rgba(133,183,235,0.50)' }}
+                >
+                  Authenticator code
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={code}
+                  onChange={e => setCode(e.target.value)}
+                  required
+                  autoFocus
+                  maxLength={6}
+                  placeholder="123456"
+                  className={`${mono} w-full px-3.5 py-2.5 rounded-[11px] text-[12.5px] outline-none transition-all duration-150 tracking-[0.3em]`}
+                  style={{ background: 'rgba(55,138,221,0.06)', border: '1px solid rgba(133,183,235,0.18)', color: '#EBF4FF' }}
+                />
+              </div>
+            )}
+
+            {/* Forgot password */}
+            <div className="text-right -mt-1">
+              <Link href="/forgot-password" className={`${mono} text-[10px]`} style={{ color: 'rgba(133,183,235,0.45)' }}>
+                Forgot password?
+              </Link>
+            </div>
+
             {/* Error */}
             {error && (
               <div
@@ -177,6 +223,24 @@ function LoginForm() {
               {loading ? 'Signing in…' : 'Sign in →'}
             </button>
           </form>
+
+          {/* SSO (Okta / Azure AD / Google Workspace / generic OIDC) */}
+          {sso.enabled && (
+            <>
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px" style={{ background: 'rgba(133,183,235,0.10)' }} />
+                <span className={`${mono} text-[9px]`} style={{ color: 'rgba(133,183,235,0.30)' }}>or</span>
+                <div className="flex-1 h-px" style={{ background: 'rgba(133,183,235,0.10)' }} />
+              </div>
+              <button
+                onClick={() => signIn('oidc', { callbackUrl })}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[11px] text-[12.5px] font-medium transition-all duration-150"
+                style={{ background: 'rgba(133,183,235,0.05)', border: '1px solid rgba(133,183,235,0.15)', color: '#85B7EB' }}
+              >
+                Continue with {sso.name}
+              </button>
+            </>
+          )}
 
           {/* GitHub OAuth */}
           {githubEnabled && (
