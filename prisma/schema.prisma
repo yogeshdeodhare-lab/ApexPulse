@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// DATABASE_URL examples:
+//   SQLite (dev):     file:./dev.db
+//   PostgreSQL (prod): postgresql://user:pass@host:5432/apex_pulse?sslmode=require
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model UsageRecord {
+  id               String   @id @default(uuid())
+  timestamp        DateTime @default(now())
+  provider         String   @default("anthropic")  // anthropic | openai | google | azure | bedrock
+  model            String
+  inputTokens      Int      @default(0)
+  outputTokens     Int      @default(0)
+  cacheReadTokens  Int      @default(0)
+  cacheWriteTokens Int      @default(0)
+  totalCost        Float    @default(0)
+  inputCost        Float    @default(0)
+  outputCost       Float    @default(0)
+  cacheReadCost    Float    @default(0)
+  cacheWriteCost   Float    @default(0)
+  userId           String?
+  teamId           String?
+  projectId        String?
+  prompt           String?
+  latencyMs        Int?
+  source           String   @default("api")
+
+  @@index([timestamp])
+  @@index([provider])
+  @@index([model])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model SeatAllocation {
+  id           String   @id @default(uuid())
+  period       String                             // "YYYY-MM"
+  provider     String                             // github_copilot | cursor | windsurf
+  seats        Int
+  pricePerSeat Float
+  createdAt    DateTime @default(now())
+
+  @@unique([period, provider])
+  @@index([period])
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  period    String   @unique  // "YYYY-MM"
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── S6: Runtime configuration (key/value, DB-backed, hot-reload) ─────────────
+
+model AppConfig {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+}
+
+// ─── S6: Users + auth ─────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  name         String?
+  passwordHash String?
+  // role: admin | finance | manager | viewer
+  role         String    @default("viewer")
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  @@index([email])
+  @@index([role])
+}
+
+// ─── S6: Compliance audit trail ───────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  timestamp  DateTime @default(now())
+  // action: CREATE | UPDATE | DELETE | LOGIN | LOGOUT | ACCESS_DENIED
+  action     String
+  // resource: budget | config | user | usage | export | optimization
+  resource   String
+  resourceId String?
+  userId     String?
+  userEmail  String?
+  ipAddress  String?
+  before     String?  // JSON-serialised previous value
+  after      String?  // JSON-serialised new value
+  metadata   String?  // JSON-serialised extra context
+
+  @@index([timestamp])
+  @@index([resource])
+  @@index([userId])
+  @@index([action])
+}
+
+// ─── S8: Persisted alert events ───────────────────────────────────────────────
+
+model AlertEvent {
+  id          String    @id @default(uuid())
+  alertKey    String    // stable dedup key matching computed alert id
+  type        String    // budget_threshold | seat_roi | cache_efficiency | security
+  severity    String    // critical | warning | info
+  title       String
+  message     String
+  value       Float?
+  threshold   Float?
+  source      String
+  active      Boolean   @default(true)
+  webhookSent Boolean   @default(false)
+  firedAt     DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  @@index([active])
+  @@index([alertKey])
+  @@index([firedAt])
+}
+
+// ─── S11: Provider credentials key vault (AES-256-GCM, never stores plaintext) ─
+
+model ProviderCredential {
+  id           String    @id @default(uuid())
+  provider     String    @unique  // anthropic | openai | google | azure | bedrock | github | slack | webhook
+  encryptedKey String
+  keyHint      String?   // last 4 chars shown in UI
+  testedAt     DateTime?
+  testOk       Boolean   @default(false)
+  createdBy    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([provider])
+}
+
+// ─── S12: Subscriptions & committed spend ─────────────────────────────────────
+
+model Subscription {
+  id             String    @id @default(uuid())
+  vendor         String    // anthropic | openai | google | azure | aws | github | cursor | windsurf | custom
+  name           String
+  tier           String    @default("usage-based")  // enterprise | team | pro | starter | usage-based
+  billingCycle   String    @default("monthly")      // monthly | annual | usage
+  startDate      DateTime
+  renewalDate    DateTime?
+  committedSpend Float?    // annual commitment (null = no commitment)
+  seats          Int?
+  pricePerSeat   Float?
+  status         String    @default("active")       // active | trial | expired | cancelled | paused
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([renewalDate])
+  @@index([vendor])
+}
+
+// ─── S16: Budget Automation & Rules Engine ────────────────────────────────────
+
+model BudgetRule {
+  id            String          @id @default(uuid())
+  name          String
+  triggerPct    Float           // fire when budget utilisation ≥ this (0-100)
+  actions       String          // JSON RuleAction[]
+  active        Boolean         @default(true)
+  cooldownHours Int             @default(4)
+  lastFiredAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  executions    RuleExecution[]
+
+  @@index([active])
+}
+
+model RuleExecution {
+  id       String     @id @default(uuid())
+  ruleId   String
+  rule     BudgetRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  firedAt  DateTime   @default(now())
+  spendPct Float
+  actions  String     // JSON [{type,ok,error?}]
+  success  Boolean    @default(true)
+  error    String?
+
+  @@index([ruleId])
+  @@index([firedAt])
+}
+
+model ProjectBudget {
+  id                String   @id @default(uuid())
+  projectId         String   @unique
+  monthlyCapDollars Float
+  alertPct          Float    @default(80)
+  hardStop          Boolean  @default(false)
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([active])
+}
+
+// ─── S14: Webhook & Alert Management ──────────────────────────────────────────
+
+model Webhook {
+  id         String            @id @default(uuid())
+  name       String
+  url        String
+  type       String            @default("http")  // slack | http | pagerduty | teams
+  events     String            // JSON string[] — event types, or ["*"] for all
+  secret     String            // hex secret used for HMAC-SHA256 signing
+  active     Boolean           @default(true)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  deliveries WebhookDelivery[]
+
+  @@index([active])
+}
+
+model WebhookDelivery {
+  id         String   @id @default(uuid())
+  webhookId  String
+  webhook    Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  eventType  String
+  statusCode Int?
+  latencyMs  Int?
+  success    Boolean  @default(false)
+  attempt    Int      @default(1)
+  error      String?
+  payload    String   // JSON snapshot of the request body sent
+  sentAt     DateTime @default(now())
+
+  @@index([webhookId])
+  @@index([sentAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CopilotEffectivenessSnapshot {
+  id                    String   @id @default(uuid())
+  dateKey               DateTime
+  codingTool            String   // github_copilot | cursor | claude_code | windsurf | cline | roo_code
+  teamId                String?
+  suggestionsShown      Int      @default(0)
+  suggestionsAccepted   Int      @default(0)
+  linesShown            Int      @default(0)
+  linesAccepted         Int      @default(0)
+  acceptanceRate        Float?
+  survivalRate          Float?
+  bugTaggedIssues       Int      @default(0)
+  avgPrMergeTimeHours   Float?
+  reviewCommentsPerPr   Float?
+  aiAssistedPrs         Int      @default(0)
+  productivityIndex     Float?
+  attributionConfidence Int      @default(2)  // 1=API  2=git  3=statistical
+  toolDailyCost         Float    @default(0)
+  createdAt             DateTime @default(now())
+
+  @@unique([dateKey, codingTool, teamId])
+  @@index([dateKey])
+  @@index([codingTool])
+}

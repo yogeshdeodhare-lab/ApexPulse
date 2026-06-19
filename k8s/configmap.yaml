@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apex-pulse-config
+  namespace: apex-pulse
+data:
+  # Next.js
+  NODE_ENV: "production"
+  NEXTAUTH_URL: "https://apex-pulse.yourcompany.internal"
+
+  # Database (non-secret parts)
+  # DATABASE_URL is in the Secret — this key is kept here as a reminder of the format.
+  # DATABASE_URL format: postgresql://USER:PASSWORD@HOST:5432/apexpulse?schema=public
+
+  # Rate limiting (overrides AppConfig default of 120 rpm)
+  RATE_LIMIT_RPM: "120"
+
+  # GitHub OAuth (optional — delete if not using)
+  # GITHUB_CLIENT_ID is in Secret for security.

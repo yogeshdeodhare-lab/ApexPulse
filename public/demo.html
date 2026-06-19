@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX Pulse · AI FinOps Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#071E3D;--sb:#042C53;--blue:#378ADD;--accent:#85B7EB;
+  --text:#EBF4FF;--dim:rgba(235,244,255,.55);--muted:rgba(133,183,235,.40);
+  --panel:rgba(13,40,69,.80);--border:rgba(133,183,235,.12);
+  --green:#22A06B;--red:#E24B4A;--amber:#C98A20;--purple:#7C3AED;--pink:#F472B6;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;font-size:14px}
+body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B73 0%,#071E3D 60%)}
+
+/* ── Sidebar ── */
+#sidebar{
+  width:228px;flex-shrink:0;height:100vh;display:flex;flex-direction:column;
+  background:var(--sb);border-right:1px solid var(--border);overflow-y:auto;
+}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-logo-mark{width:34px;height:34px;border-radius:10px;background:#185FA5;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-text .brand{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.sb-logo-text .tagline{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:1px}
+.sb-section{padding:10px 8px 4px;font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.sb-item{
+  display:flex;align-items:center;gap:9px;padding:8px 10px;margin:1px 6px;
+  border-radius:9px;cursor:pointer;transition:background .15s;
+  font-family:var(--mono);font-size:11px;color:rgba(235,244,255,.50);
+}
+.sb-item:hover{background:rgba(55,138,221,.10);color:var(--accent)}
+.sb-item.active{background:rgba(55,138,221,.18);color:#EBF4FF;font-weight:600}
+.sb-item.active .sb-dot{background:var(--blue)}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:rgba(133,183,235,.25);flex-shrink:0}
+.sb-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:10px;background:rgba(55,138,221,.15);color:var(--blue)}
+.sb-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border);font-family:var(--mono);font-size:8.5px;color:rgba(133,183,235,.25)}
+
+/* ── Main ── */
+#main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
+#topbar{
+  display:flex;align-items:center;gap:12px;padding:0 20px;min-height:52px;flex-shrink:0;
+  background:rgba(7,30,61,.90);border-bottom:1px solid var(--border);
+}
+.tb-title{font-size:13px;font-weight:600;color:var(--text)}
+.tb-sub{font-family:var(--mono);font-size:9px;color:rgba(133,183,235,.40);margin-top:2px}
+.tb-badge{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:8px;background:rgba(55,138,221,.10);border:1px solid rgba(133,183,235,.15);margin-left:auto}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+#content{flex:1;overflow-y:auto;padding:20px 24px}
+
+/* ── Panel ── */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px 20px;backdrop-filter:blur(10px)}
+.panel-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.panel-title{font-size:13px;font-weight:600;color:var(--text)}
+.panel-sub{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px}
+.badge-pill{font-family:var(--mono);font-size:8.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:rgba(55,138,221,.12);color:var(--blue);border:1px solid rgba(55,138,221,.20)}
+
+/* ── KPI grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.kpi-label{font-family:var(--mono);font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.kpi-unit{font-size:12px;font-weight:400;color:var(--muted);margin-left:2px}
+.kpi-sub{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px}
+.kpi-bar{height:2px;border-radius:1px;background:rgba(133,183,235,.12);margin-top:8px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:1px;transition:width .6s}
+
+/* ── Page nav ── */
+.page{display:none}.page.active{display:block}
+
+/* ── Grid helpers ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.space-y>*+*{margin-top:12px}
+
+/* ── Provider donut ── */
+.donut-wrap{display:flex;align-items:center;gap:24px}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:11px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-name{flex:1;color:var(--dim)}
+.legend-val{font-family:var(--mono);font-size:10px;color:var(--text);font-weight:600}
+.legend-pct{font-family:var(--mono);font-size:9px;color:var(--muted)}
+
+/* ── Table ── */
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{font-family:var(--mono);font-size:8.5px;color:var(--muted);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 10px;border-bottom:1px solid rgba(133,183,235,.06);color:var(--dim)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(55,138,221,.04);color:var(--text)}
+.mono{font-family:var(--mono)}
+.tag{display:inline-block;font-family:var(--mono);font-size:8.5px;padding:2px 7px;border-radius:10px}
+
+/* ── Opt cards ── */
+.opt-card{background:rgba(13,40,69,.80);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.opt-stripe{height:2px}
+.opt-body{padding:16px}
+.opt-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.type-badge,.pri-badge{font-family:var(--mono);font-size:8.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+.opt-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.opt-desc{font-size:11px;color:var(--dim);line-height:1.55;margin-bottom:12px}
+.before-after{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;gap:8px;background:rgba(7,30,61,.60);border:1px solid rgba(133,183,235,.08);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.ba-label{font-family:var(--mono);font-size:8px;color:var(--muted);margin-bottom:4px}
+.ba-tag{font-family:var(--mono);font-size:9px;color:rgba(235,244,255,.45);margin-bottom:3px}
+.ba-cost{font-size:18px;font-weight:700;line-height:1}
+.ba-mo{font-size:10px;font-weight:400;color:var(--muted)}
+.ba-arrow{font-size:20px;color:rgba(133,183,235,.25);text-align:center}
+.savings-box{display:flex;align-items:center;gap:12px;background:rgba(34,160,107,.08);border:1px solid rgba(34,160,107,.20);border-radius:9px;padding:10px 12px;margin-bottom:10px}
+.savings-num{font-size:20px;font-weight:700;color:var(--green)}
+.savings-label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green)}
+.savings-yr{font-family:var(--mono);font-size:9px;color:rgba(34,160,107,.65)}
+.bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-track{flex:1;height:5px;border-radius:3px;background:rgba(133,183,235,.12);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--blue))}
+.bar-pct{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.eff-box{background:rgba(201,138,32,.07);border:1px solid rgba(201,138,32,.18);border-radius:9px;padding:10px 12px;margin-bottom:10px}
+.eff-hdr{font-family:var(--mono);font-size:8.5px;font-weight:700;color:var(--amber);margin-bottom:8px}
+.eff-grid{display:flex;align-items:center;gap:16px}
+.eff-metric{font-family:var(--mono);font-size:8px;color:var(--muted)}
+.eff-val{font-size:18px;font-weight:700}
+.eff-bench{font-family:var(--mono);font-size:8px;color:rgba(133,183,235,.35)}
+.eff-text{flex:1;font-size:10px;color:rgba(235,244,255,.50);line-height:1.5}
+.action-box{background:rgba(55,138,221,.06);border:1px solid rgba(55,138,221,.14);border-radius:9px;padding:10px 12px;margin-bottom:10px}
+.action-hdr{font-family:var(--mono);font-size:8.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
+.action-text{font-size:10px;color:rgba(235,244,255,.60);line-height:1.5}
+.calc-toggle{font-family:var(--mono);font-size:9px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;transition:color .15s}
+.calc-toggle:hover{color:var(--blue)}
+.calc-box{font-family:var(--mono);font-size:9.5px;color:rgba(133,183,235,.60);background:rgba(7,30,61,.50);border:1px solid rgba(133,183,235,.08);border-radius:8px;padding:10px 12px;margin-top:8px;line-height:1.7;display:none}
+.calc-box.open{display:block}
+
+/* ── Category filter ── */
+.cat-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.cat-btn{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid rgba(133,183,235,.12);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;transition:all .15s}
+.cat-btn:hover{color:var(--accent);border-color:rgba(133,183,235,.25)}
+.cat-btn.active{background:rgba(55,138,221,.15);color:var(--blue);border-color:rgba(55,138,221,.35)}
+
+/* ── Team cards ── */
+.team-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+.team-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.team-avatar{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.team-name{font-size:13px;font-weight:600;color:var(--text)}
+.team-sub{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px}
+.team-stat{margin-bottom:6px}
+.team-stat-label{font-family:var(--mono);font-size:8.5px;color:var(--muted)}
+.team-stat-val{font-size:13px;font-weight:600;margin-top:1px}
+.prog-bar{height:4px;border-radius:2px;background:rgba(133,183,235,.12);overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:2px;background:var(--blue)}
+.chip-wrap{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.chip{font-family:var(--mono);font-size:8px;padding:2px 7px;border-radius:10px;background:rgba(55,138,221,.10);color:var(--accent);border:1px solid rgba(133,183,235,.12)}
+
+/* ── Settings ── */
+.int-row{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:9px;margin-bottom:4px;border:1px solid rgba(133,183,235,.07)}
+.int-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.int-name{font-size:11px;font-weight:500;flex:1}
+.int-key{font-family:var(--mono);font-size:8.5px;color:var(--muted);padding:2px 6px;background:rgba(133,183,235,.07);border-radius:6px}
+.int-status{font-family:var(--mono);font-size:8.5px;font-weight:600;padding:2px 8px;border-radius:10px}
+.active-status{background:rgba(34,160,107,.12);color:var(--green);border:1px solid rgba(34,160,107,.25)}
+.inactive-status{background:rgba(133,183,235,.06);color:var(--muted);border:1px solid rgba(133,183,235,.10)}
+
+/* ── Effectiveness ── */
+.eff-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+.eff-tool-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.eff-tool-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+.roi-bar{height:6px;border-radius:3px;overflow:hidden;margin-top:10px;background:rgba(133,183,235,.12)}
+.roi-fill{height:100%;border-radius:3px}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.metric-cell{background:rgba(7,30,61,.50);border-radius:8px;padding:8px 10px}
+.metric-cell-label{font-family:var(--mono);font-size:8px;color:var(--muted)}
+.metric-cell-val{font-size:15px;font-weight:700;margin-top:3px;line-height:1}
+.metric-cell-bench{font-family:var(--mono);font-size:8px;color:rgba(133,183,235,.35);margin-top:1px}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(133,183,235,.20);border-radius:4px}
+
+/* ── Budget meter ── */
+.budget-meter{background:rgba(7,30,61,.60);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.meter-track{height:8px;background:rgba(133,183,235,.12);border-radius:4px;overflow:hidden;margin:10px 0 6px}
+.meter-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),#378ADD)}
+.meter-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">
+      <svg width="22" height="22" viewBox="0 0 56 56" fill="none">
+        <polyline points="6,34 14,34 19,20 25,42 31,24 36,32 41,32 50,32"
+          stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="31" cy="24" r="2.6" fill="#85B7EB"/>
+      </svg>
+    </div>
+    <div class="sb-logo-text">
+      <div class="brand">APEX Pulse</div>
+      <div class="tagline">AI FinOps Intelligence</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Core</div>
+  <div class="sb-item active" data-page="overview">
+    <span class="sb-icon">▣</span>Executive Overview<div class="sb-dot"></div>
+  </div>
+  <div class="sb-item" data-page="providers">
+    <span class="sb-icon">⬡</span>Providers<span class="sb-badge">8</span>
+  </div>
+  <div class="sb-item" data-page="teams">
+    <span class="sb-icon">◎</span>Teams &amp; Attribution
+  </div>
+  <div class="sb-item" data-page="budget">
+    <span class="sb-icon">◫</span>Budget &amp; Forecast
+  </div>
+
+  <div class="sb-section">Insights</div>
+  <div class="sb-item" data-page="optimization">
+    <span class="sb-icon">↗</span>Optimization<span class="sb-badge">9</span>
+  </div>
+  <div class="sb-item" data-page="effectiveness">
+    <span class="sb-icon">⟳</span>Coding Effectiveness
+  </div>
+
+  <div class="sb-section">Platform</div>
+  <div class="sb-item" data-page="settings">
+    <span class="sb-icon">⚙</span>Settings
+  </div>
+
+  <div class="sb-footer">
+    APEX Pulse · v5.0.0 · S5<br>
+    SQLite · 8 providers connected
+  </div>
+</nav>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════════════ -->
+<div id="main">
+  <header id="topbar">
+    <div>
+      <div class="tb-title" id="tb-title">Executive Overview</div>
+      <div class="tb-sub" id="tb-sub">June 2026 · Multi-provider · Sprint 5</div>
+    </div>
+    <div class="tb-badge">
+      <span class="live-dot"></span>
+      <span style="color:var(--blue);font-weight:600">live</span>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- ══ PAGE: OVERVIEW ══════════════════════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-label">MTD Spend</div>
+          <div class="kpi-val">$239<span class="kpi-unit">.40</span></div>
+          <div class="kpi-sub">3% of $8,000 budget</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width:3%;background:var(--green)"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">30-Day Spend</div>
+          <div class="kpi-val">$521<span class="kpi-unit">.73</span></div>
+          <div class="kpi-sub">↑ 12% vs prior period</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">API Calls (30d)</div>
+          <div class="kpi-val">1,658</div>
+          <div class="kpi-sub">8 providers · 12 models</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Potential Savings</div>
+          <div class="kpi-val" style="color:var(--green)">$1,051<span class="kpi-unit">/mo</span></div>
+          <div class="kpi-sub">$12.6k/year · 9 opportunities</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-hdr">
+            <div>
+              <div class="panel-title">Provider Spend Mix</div>
+              <div class="panel-sub">30-day token cost by provider</div>
+            </div>
+            <span class="badge-pill">30 DAYS</span>
+          </div>
+          <div class="donut-wrap">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(133,183,235,.08)" stroke-width="18"/>
+              <!-- Anthropic 74% → 276.2 / 373.9 -->
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#378ADD" stroke-width="18"
+                stroke-dasharray="204.2 72.0" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+              <!-- Azure 9.3% → 34.7 -->
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#7C3AED" stroke-width="18"
+                stroke-dasharray="25.7 250.5" stroke-dashoffset="-204.2" transform="rotate(-90 60 60)"/>
+              <!-- OpenAI 8.2% -->
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#22A06B" stroke-width="18"
+                stroke-dasharray="22.7 254.5" stroke-dashoffset="-229.9" transform="rotate(-90 60 60)"/>
+              <!-- Bedrock 4.6% -->
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#C98A20" stroke-width="18"
+                stroke-dasharray="12.8 264.4" stroke-dashoffset="-252.6" transform="rotate(-90 60 60)"/>
+              <!-- Google 4% -->
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#F472B6" stroke-width="18"
+                stroke-dasharray="11.1 266.1" stroke-dashoffset="-265.4" transform="rotate(-90 60 60)"/>
+              <text x="60" y="56" text-anchor="middle" fill="#EBF4FF" font-size="13" font-weight="700" font-family="system-ui">$521</text>
+              <text x="60" y="70" text-anchor="middle" fill="rgba(133,183,235,.50)" font-size="8" font-family="JetBrains Mono,monospace">total 30d</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#378ADD"></div><span class="legend-name">Anthropic</span><span class="legend-val">$385.70</span><span class="legend-pct">74%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div><span class="legend-name">Azure OpenAI</span><span class="legend-val">$48.30</span><span class="legend-pct">9.3%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#22A06B"></div><span class="legend-name">OpenAI</span><span class="legend-val">$42.60</span><span class="legend-pct">8.2%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#C98A20"></div><span class="legend-name">AWS Bedrock</span><span class="legend-val">$24.10</span><span class="legend-pct">4.6%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#F472B6"></div><span class="legend-name">Google Gemini</span><span class="legend-val">$21.03</span><span class="legend-pct">4%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr">
+            <div>
+              <div class="panel-title">Top Models by Cost</div>
+              <div class="panel-sub">30-day · ranked by total spend</div>
+            </div>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>Provider</th><th>Calls</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--accent)">claude-sonnet-4-6</td><td><span class="tag" style="background:rgba(55,138,221,.12);color:var(--blue)">Anthropic</span></td><td class="mono">612</td><td class="mono" style="color:var(--text);font-weight:600">$218.40</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">claude-opus-4-8</td><td><span class="tag" style="background:rgba(55,138,221,.12);color:var(--blue)">Anthropic</span></td><td class="mono">215</td><td class="mono" style="color:var(--text);font-weight:600">$142.80</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">claude-haiku-4-5</td><td><span class="tag" style="background:rgba(55,138,221,.12);color:var(--blue)">Anthropic</span></td><td class="mono">389</td><td class="mono" style="color:var(--text);font-weight:600">$24.50</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">gpt-4o</td><td><span class="tag" style="background:rgba(124,58,237,.10);color:#A78BFA">Azure</span></td><td class="mono">72</td><td class="mono" style="color:var(--text);font-weight:600">$48.30</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">gpt-4o</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">OpenAI</span></td><td class="mono">86</td><td class="mono" style="color:var(--text);font-weight:600">$32.20</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">claude-3-5-sonnet</td><td><span class="tag" style="background:rgba(201,138,32,.10);color:var(--amber)">Bedrock</span></td><td class="mono">51</td><td class="mono" style="color:var(--text);font-weight:600">$12.03</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="panel-hdr">
+          <div>
+            <div class="panel-title">Recent Usage</div>
+            <div class="panel-sub">Last 10 API calls across all providers</div>
+          </div>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Timestamp</th><th>Team</th><th>Project</th><th>Model</th><th>Input</th><th>Output</th><th>Cache Read</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="color:var(--muted)">2026-06-14 14:22</td><td><span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent)">platform</span></td><td class="mono">platform-shared</td><td class="mono" style="color:var(--accent)">claude-sonnet-4-6</td><td class="mono">82,441</td><td class="mono">7,123</td><td class="mono" style="color:var(--green)">68,200</td><td class="mono" style="color:var(--text);font-weight:600">$0.51</td></tr>
+            <tr><td class="mono" style="color:var(--muted)">2026-06-14 13:58</td><td><span class="tag" style="background:rgba(201,138,32,.10);color:var(--amber)">agentic</span></td><td class="mono">agentic-poc</td><td class="mono" style="color:var(--accent)">claude-opus-4-8</td><td class="mono">55,112</td><td class="mono">4,892</td><td class="mono" style="color:var(--green)">48,000</td><td class="mono" style="color:var(--text);font-weight:600">$1.24</td></tr>
+            <tr><td class="mono" style="color:var(--muted)">2026-06-14 13:41</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">rag</span></td><td class="mono">rag-search</td><td class="mono" style="color:var(--accent)">claude-sonnet-4-6</td><td class="mono">38,900</td><td class="mono">2,210</td><td class="mono" style="color:var(--green)">31,500</td><td class="mono" style="color:var(--text);font-weight:600">$0.22</td></tr>
+            <tr><td class="mono" style="color:var(--muted)">2026-06-14 13:15</td><td><span class="tag" style="background:rgba(124,58,237,.10);color:#A78BFA">modern</span></td><td class="mono">legacy-modern</td><td class="mono" style="color:var(--accent)">gpt-4o</td><td class="mono">41,200</td><td class="mono">3,880</td><td class="mono" style="color:rgba(133,183,235,.30)">—</td><td class="mono" style="color:var(--text);font-weight:600">$0.67</td></tr>
+            <tr><td class="mono" style="color:var(--muted)">2026-06-14 12:54</td><td><span class="tag" style="background:rgba(55,138,221,.10);color:var(--accent)">platform</span></td><td class="mono">platform-shared</td><td class="mono" style="color:var(--accent)">claude-haiku-4-5</td><td class="mono">6,230</td><td class="mono">892</td><td class="mono" style="color:var(--green)">9,100</td><td class="mono" style="color:var(--text);font-weight:600">$0.01</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: PROVIDERS ════════════════════════════════════════════════ -->
+    <div class="page" id="page-providers">
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="kpi-label">Active Providers</div><div class="kpi-val">8</div><div class="kpi-sub">5 API · 3 seat tools</div></div>
+        <div class="kpi"><div class="kpi-label">Models Tracked</div><div class="kpi-val">12</div><div class="kpi-sub">Across all providers</div></div>
+        <div class="kpi"><div class="kpi-label">Avg Cost/1M Tokens</div><div class="kpi-val">$4<span class="kpi-unit">.80</span></div><div class="kpi-sub">Blended input rate</div></div>
+        <div class="kpi"><div class="kpi-label">Cache Hit Rate</div><div class="kpi-val">61<span class="kpi-unit">%</span></div><div class="kpi-sub">Anthropic only</div></div>
+      </div>
+      <div class="grid2 mt16">
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">Anthropic Claude</div><div class="panel-sub">Direct API · prompt caching enabled</div></div><span class="badge-pill">PRIMARY</span></div>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>$/1M in</th><th>$/1M out</th><th>Calls</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--accent)">claude-opus-4-8</td><td class="mono">$15.00</td><td class="mono">$75.00</td><td class="mono">215</td><td class="mono" style="color:var(--text);font-weight:600">$142.80</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">claude-sonnet-4-6</td><td class="mono">$3.00</td><td class="mono">$15.00</td><td class="mono">612</td><td class="mono" style="color:var(--text);font-weight:600">$218.40</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">claude-haiku-4-5</td><td class="mono">$0.80</td><td class="mono">$4.00</td><td class="mono">389</td><td class="mono" style="color:var(--text);font-weight:600">$24.50</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px;background:rgba(55,138,221,.06);border-radius:8px;padding:8px 10px;font-family:var(--mono);font-size:9px;color:var(--muted)">
+            Cache write: $3.75/M · Cache read: $0.30/M · 61% avg hit rate
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">OpenAI</div><div class="panel-sub">Direct API · no prompt caching</div></div></div>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>$/1M in</th><th>$/1M out</th><th>Calls</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--accent)">gpt-4o</td><td class="mono">$2.50</td><td class="mono">$10.00</td><td class="mono">86</td><td class="mono" style="color:var(--text);font-weight:600">$32.20</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">gpt-4o-mini</td><td class="mono">$0.15</td><td class="mono">$0.60</td><td class="mono">148</td><td class="mono" style="color:var(--text);font-weight:600">$6.40</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">o3-mini</td><td class="mono">$1.10</td><td class="mono">$4.40</td><td class="mono">42</td><td class="mono" style="color:var(--text);font-weight:600">$4.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">Azure OpenAI</div><div class="panel-sub">Enterprise · ~10% premium vs OpenAI direct</div></div></div>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>$/1M in</th><th>$/1M out</th><th>Calls</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--accent)">gpt-4o</td><td class="mono">$2.75</td><td class="mono">$11.00</td><td class="mono">72</td><td class="mono" style="color:var(--text);font-weight:600">$48.30</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">gpt-4o-mini</td><td class="mono">$0.17</td><td class="mono">$0.68</td><td class="mono">96</td><td class="mono" style="color:var(--text);font-weight:600">$2.80</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">AWS Bedrock</div><div class="panel-sub">Infrastructure margin · older model versions</div></div></div>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>$/1M in</th><th>$/1M out</th><th>Calls</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--accent)">claude-3-5-sonnet</td><td class="mono">$3.00</td><td class="mono">$15.00</td><td class="mono">51</td><td class="mono" style="color:var(--text);font-weight:600">$12.03</td></tr>
+              <tr><td class="mono" style="color:var(--accent)">claude-3-haiku</td><td class="mono">$0.25</td><td class="mono">$1.25</td><td class="mono">38</td><td class="mono" style="color:var(--text);font-weight:600">$0.38</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: TEAMS ════════════════════════════════════════════════════ -->
+    <div class="page" id="page-teams">
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="kpi-label">Teams</div><div class="kpi-val">4</div><div class="kpi-sub">platform · modern · agentic · rag</div></div>
+        <div class="kpi"><div class="kpi-label">Contributors</div><div class="kpi-val">6</div><div class="kpi-sub">Tracked by user ID</div></div>
+        <div class="kpi"><div class="kpi-label">Top Team Spend</div><div class="kpi-val">$195<span class="kpi-unit">/mo</span></div><div class="kpi-sub">Platform team · MTD</div></div>
+        <div class="kpi"><div class="kpi-label">Projects</div><div class="kpi-val">4</div><div class="kpi-sub">Full attribution</div></div>
+      </div>
+      <div class="grid2 mt16">
+        <div class="team-card">
+          <div class="team-hdr">
+            <div class="team-avatar" style="background:rgba(55,138,221,.15);color:var(--blue)">PL</div>
+            <div><div class="team-name">Platform</div><div class="team-sub">2 contributors · platform-shared project</div></div>
+          </div>
+          <div class="team-stat"><div class="team-stat-label">MTD SPEND</div><div class="team-stat-val" style="color:var(--blue)">$195.40</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:82%"></div></div>
+          </div>
+          <div class="grid2 mt12">
+            <div><div class="team-stat-label">AVG INPUT</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">72k tokens</div></div>
+            <div><div class="team-stat-label">CALLS</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">421</div></div>
+          </div>
+          <div class="chip-wrap">
+            <span class="chip">claude-sonnet-4-6</span><span class="chip">claude-opus-4-8</span><span class="chip">cache-enabled</span>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-hdr">
+            <div class="team-avatar" style="background:rgba(124,58,237,.15);color:#A78BFA">LM</div>
+            <div><div class="team-name">Modernization</div><div class="team-sub">2 contributors · legacy-modernization</div></div>
+          </div>
+          <div class="team-stat"><div class="team-stat-label">MTD SPEND</div><div class="team-stat-val" style="color:#A78BFA">$167.80</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:70%;background:#7C3AED"></div></div>
+          </div>
+          <div class="grid2 mt12">
+            <div><div class="team-stat-label">AVG INPUT</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">58k tokens</div></div>
+            <div><div class="team-stat-label">CALLS</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">387</div></div>
+          </div>
+          <div class="chip-wrap">
+            <span class="chip">claude-sonnet-4-6</span><span class="chip">gpt-4o</span><span class="chip">multi-provider</span>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-hdr">
+            <div class="team-avatar" style="background:rgba(201,138,32,.15);color:var(--amber)">AG</div>
+            <div><div class="team-name">Agentic</div><div class="team-sub">1 contributor · agentic-poc project</div></div>
+          </div>
+          <div class="team-stat"><div class="team-stat-label">MTD SPEND</div><div class="team-stat-val" style="color:var(--amber)">$142.50</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:60%;background:var(--amber)"></div></div>
+          </div>
+          <div class="grid2 mt12">
+            <div><div class="team-stat-label">AVG INPUT</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">91k tokens</div></div>
+            <div><div class="team-stat-label">CALLS</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">215</div></div>
+          </div>
+          <div class="chip-wrap">
+            <span class="chip">claude-opus-4-8</span><span class="chip">opus-heavy</span><span class="chip">agentic-loops</span>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-hdr">
+            <div class="team-avatar" style="background:rgba(34,160,107,.15);color:var(--green)">RG</div>
+            <div><div class="team-name">RAG</div><div class="team-sub">1 contributor · rag-search project</div></div>
+          </div>
+          <div class="team-stat"><div class="team-stat-label">MTD SPEND</div><div class="team-stat-val" style="color:var(--green)">$16.03</div>
+            <div class="prog-bar"><div class="prog-fill" style="width:7%;background:var(--green)"></div></div>
+          </div>
+          <div class="grid2 mt12">
+            <div><div class="team-stat-label">AVG INPUT</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">38k tokens</div></div>
+            <div><div class="team-stat-label">CALLS</div><div class="team-stat-val" style="font-size:13px;color:var(--dim)">209</div></div>
+          </div>
+          <div class="chip-wrap">
+            <span class="chip">claude-haiku-4-5</span><span class="chip">claude-sonnet-4-6</span><span class="chip">retrieval</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: BUDGET ═══════════════════════════════════════════════════ -->
+    <div class="page" id="page-budget">
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="kpi-label">Monthly Budget</div><div class="kpi-val">$8,000</div><div class="kpi-sub">Set for June 2026</div></div>
+        <div class="kpi"><div class="kpi-label">MTD Consumed</div><div class="kpi-val" style="color:var(--green)">$239<span class="kpi-unit">.40</span></div><div class="kpi-sub">3% utilization · on track</div></div>
+        <div class="kpi"><div class="kpi-label">Remaining</div><div class="kpi-val">$7,760<span class="kpi-unit">.60</span></div><div class="kpi-sub">17 days left in month</div></div>
+        <div class="kpi"><div class="kpi-label">Forecast (EOM)</div><div class="kpi-val">$424<span class="kpi-unit">/mo</span></div><div class="kpi-sub">~5.3% of budget · safe</div></div>
+      </div>
+      <div class="panel mt16">
+        <div class="panel-hdr"><div><div class="panel-title">Budget Utilization</div><div class="panel-sub">Alert triggers at 80% ($6,400) and 95% ($7,600)</div></div><span class="badge-pill">SAFE</span></div>
+        <div class="budget-meter">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px">
+            <span>$0</span><span style="color:var(--green);font-weight:600">$239.40 consumed</span><span>$8,000</span>
+          </div>
+          <div class="meter-track"><div class="meter-fill" style="width:3%"></div></div>
+          <div class="meter-labels"><span>0%</span><span style="color:var(--amber)">80% alert</span><span style="color:var(--red)">95% critical</span><span>100%</span></div>
+        </div>
+      </div>
+      <div class="grid2 mt16">
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">Alert Thresholds</div><div class="panel-sub">Slack + webhook · budget state machine</div></div></div>
+          <div class="space-y">
+            <div class="int-row" style="background:rgba(34,160,107,.05)">
+              <div class="int-dot" style="background:var(--green)"></div>
+              <div class="int-name">SAFE <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">0–79%</span></div>
+              <div class="int-status active-status">CURRENT</div>
+            </div>
+            <div class="int-row">
+              <div class="int-dot" style="background:var(--amber)"></div>
+              <div class="int-name">WARNING <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">80–94% · fires Slack alert</span></div>
+              <div class="int-status inactive-status">INACTIVE</div>
+            </div>
+            <div class="int-row">
+              <div class="int-dot" style="background:var(--red)"></div>
+              <div class="int-name">CRITICAL <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">≥95% · fires webhook</span></div>
+              <div class="int-status inactive-status">INACTIVE</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">Daily Spend Trend</div><div class="panel-sub">June MTD · token API costs only</div></div></div>
+          <svg width="100%" height="90" viewBox="0 0 340 90" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#378ADD" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#378ADD" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,80 L24,75 L48,70 L72,68 L96,65 L120,60 L144,55 L168,58 L192,50 L216,48 L240,45 L264,42 L288,38 L312,35 L336,30 L340,30 L340,90 L0,90 Z"
+              fill="url(#spendGrad)"/>
+            <path d="M0,80 L24,75 L48,70 L72,68 L96,65 L120,60 L144,55 L168,58 L192,50 L216,48 L240,45 L264,42 L288,38 L312,35 L336,30"
+              fill="none" stroke="#378ADD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8.5px;color:var(--muted);margin-top:4px">
+            <span>Jun 1</span><span>Jun 7</span><span>Jun 14</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: OPTIMIZATION ═════════════════════════════════════════════ -->
+    <div class="page" id="page-optimization">
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="kpi-label">Total Monthly Savings</div><div class="kpi-val" style="color:var(--green)">$1,051<span class="kpi-unit">/mo</span></div><div class="kpi-sub">$12.6k/year if actioned</div></div>
+        <div class="kpi"><div class="kpi-label">Opportunities</div><div class="kpi-val">9 <span class="kpi-unit">found</span></div><div class="kpi-sub">3 critical or high priority</div></div>
+        <div class="kpi"><div class="kpi-label">Top Category</div><div class="kpi-val" style="font-size:15px">Seat ROI</div><div class="kpi-sub">$1,018/mo combined</div></div>
+        <div class="kpi"><div class="kpi-label">Data Window</div><div class="kpi-val">30 <span class="kpi-unit">days</span></div><div class="kpi-sub">1,658 records analyzed</div></div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="panel-hdr">
+          <div>
+            <div class="panel-title">Optimization Opportunities</div>
+            <div class="panel-sub">Ranked by monthly savings · expand CALCULATION BASIS for full formula</div>
+          </div>
+          <span class="badge-pill">9 IDENTIFIED</span>
+        </div>
+        <div class="cat-strip">
+          <button class="cat-btn active" data-cat="all">All · $1,051</button>
+          <button class="cat-btn" data-cat="seat_roi">💺 Seat ROI · $1,018.50</button>
+          <button class="cat-btn" data-cat="model_routing">⇄ Model Routing · $27.67</button>
+          <button class="cat-btn" data-cat="cache_strategy">⚡ Cache Strategy · $4.30</button>
+          <button class="cat-btn" data-cat="provider_arbitrage">⇌ Provider Arbitrage · $0.93</button>
+        </div>
+
+        <!-- SEAT ROI 1 -->
+        <div class="opt-card" data-type="seat_roi">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#C98A2088,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(201,138,32,.12);color:var(--amber);border:1px solid rgba(201,138,32,.25)">💺 Seat ROI</span>
+              <span class="pri-badge" style="background:rgba(226,75,74,.12);color:var(--red);border:1px solid rgba(226,75,74,.25)">CRITICAL</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">210 seats · 82% confidence</span>
+            </div>
+            <div class="opt-title">GitHub Copilot: ROI 0.79× on 210 seats @ $19/seat</div>
+            <div class="opt-desc">Monthly seat cost $3,990. Code value generated: ~$3,136 (2,851 lines/day × 22 days × $0.05/line). Acceptance rate 31.2% vs 35% benchmark — low adoption dragging ROI below 1×.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">210 seats × $19 = $3,990/mo</div><div class="ba-cost" style="color:var(--red)">$3,990<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">Remove ~32 low-adopter seats</div><div class="ba-cost" style="color:var(--green)">$3,392<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$598.50</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$7,182 / year</div></div>
+            </div>
+            <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div><span class="bar-pct">85% of current</span></div>
+            <div class="eff-box">
+              <div class="eff-hdr">⟳ EFFECTIVENESS LINK · GitHub Copilot</div>
+              <div class="eff-grid">
+                <div><div class="eff-metric">Acceptance Rate</div><div class="eff-val" style="color:var(--red)">31.2%</div><div class="eff-bench">benchmark 35%</div></div>
+                <div class="eff-text">Developers are rejecting ~69% of AI completions. Low acceptance typically means poor context fit or irrelevant suggestions. Survival rate 93.6% is healthy — the accepted code is good, just not enough of it.</div>
+              </div>
+            </div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">Audit usage logs: identify users with fewer than 5 suggestions/day over the past 30 days. Offer targeted onboarding or reclaim unused seats from non-adopters.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">Seat cost: 210 × $19 = $3,990/mo. Code value: 2,851 lines/day (total across all users) × 22 days × $0.05/line = $3,136.10/mo. ROI = $3,136.10 ÷ $3,990 = 0.786× (target ≥ 1.5×). Acceptance 31.2% &lt; 35% → ~15% of seats are low-adopters → removing 32 seats saves $608 - $9.50 fee ≈ $598.50/mo.</div>
+          </div>
+        </div>
+
+        <!-- SEAT ROI 2 -->
+        <div class="opt-card" data-type="seat_roi">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#C98A2088,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(201,138,32,.12);color:var(--amber);border:1px solid rgba(201,138,32,.25)">💺 Seat ROI</span>
+              <span class="pri-badge" style="background:rgba(226,75,74,.12);color:var(--red);border:1px solid rgba(226,75,74,.25)">CRITICAL</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">80 seats · 82% confidence</span>
+            </div>
+            <div class="opt-title">Cursor: ROI 1.28× on 80 seats @ $20/seat</div>
+            <div class="opt-desc">Monthly seat cost $1,600. Code value generated: ~$2,048 (1,855 lines/day × 22 days × $0.05/line). ROI above 1× but acceptance rate 28.1% is well below the 35% benchmark — many developers not adopting suggestions.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">80 seats × $20 = $1,600/mo</div><div class="ba-cost" style="color:var(--red)">$1,600<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">Remove ~12 non-adopter seats</div><div class="ba-cost" style="color:var(--green)">$1,360<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$240</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$2,880 / year</div></div>
+            </div>
+            <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div><span class="bar-pct">85% of current</span></div>
+            <div class="eff-box">
+              <div class="eff-hdr">⟳ EFFECTIVENESS LINK · Cursor</div>
+              <div class="eff-grid">
+                <div><div class="eff-metric">Acceptance Rate</div><div class="eff-val" style="color:var(--red)">28.1%</div><div class="eff-bench">benchmark 35%</div></div>
+                <div class="eff-text">Acceptance rate 28.1% is 7 points below benchmark. Survival rate 90.7% is slightly below the 92% target — AI code passing review but with marginal quality, suggesting the model context is misaligned with the codebase.</div>
+              </div>
+            </div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">Configure Cursor with project-specific context files (.cursorrules). Run a 1-sprint A/B: assign one team to GitHub Copilot and compare acceptance rates after 2 weeks.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">Seat cost: 80 × $20 = $1,600/mo. Code value: 1,855 lines/day × 22 days × $0.05/line = $2,040.50/mo. ROI = $2,040.50 ÷ $1,600 = 1.28×. Acceptance 28.1% &lt; 35% → ~15% of seats are low-adopters → removing 12 seats saves $240/mo.</div>
+          </div>
+        </div>
+
+        <!-- SEAT ROI 3 -->
+        <div class="opt-card" data-type="seat_roi">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#C98A2088,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(201,138,32,.12);color:var(--amber);border:1px solid rgba(201,138,32,.25)">💺 Seat ROI</span>
+              <span class="pri-badge" style="background:rgba(201,138,32,.12);color:var(--amber);border:1px solid rgba(201,138,32,.25)">HIGH</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">60 seats · 82% confidence</span>
+            </div>
+            <div class="opt-title">Windsurf: ROI 1.19× on 60 seats @ $15/seat</div>
+            <div class="opt-desc">Monthly seat cost $900. Code value: ~$1,079 (980 lines/day × 22 days × $0.05). ROI below 1.5× target. Acceptance data not captured — 0% measured suggests logging not configured for this tool.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">60 seats × $15 = $900/mo</div><div class="ba-cost" style="color:var(--red)">$900<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">Remove ~12 seats or switch tool</div><div class="ba-cost" style="color:var(--green)">$720<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$180</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$2,160 / year</div></div>
+            </div>
+            <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><span class="bar-pct">80% of current</span></div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">First: enable acceptance rate logging for Windsurf via IDE telemetry API. Then run a 30-day before/after comparison. If acceptance stays below 25%, consolidate seats into Copilot or Cursor.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">Seat cost: 60 × $15 = $900/mo. Code value: 980 lines/day × 22 days × $0.05/line = $1,078/mo. ROI = $1,078 ÷ $900 = 1.19× (target ≥ 1.5×). Acceptance: null → ~20% of seats flagged as low-adopters → removing 12 seats saves $180/mo.</div>
+          </div>
+        </div>
+
+        <!-- MODEL ROUTING 1 -->
+        <div class="opt-card" data-type="model_routing">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#378ADD88,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(55,138,221,.12);color:var(--blue);border:1px solid rgba(55,138,221,.25)">⇄ Model Routing</span>
+              <span class="pri-badge" style="background:rgba(55,138,221,.10);color:var(--blue);border:1px solid rgba(55,138,221,.20)">MEDIUM</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">47 requests · 75% confidence</span>
+            </div>
+            <div class="opt-title">Route Claude Opus 4.8 short tasks → Claude Sonnet 4.6</div>
+            <div class="opt-desc">47 of your Claude Opus requests had fewer than 15k input tokens — a task size Sonnet handles equally well at 80% lower price. Architecture reviews warrant Opus; quick code reviews do not.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">claude-opus-4-8 @ $15/M in · $75/M out</div><div class="ba-cost" style="color:var(--red)">$28.20<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">claude-sonnet-4-6 @ $3/M in · $15/M out</div><div class="ba-cost" style="color:var(--green)">$3.73<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$24.47</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$293.64 / year</div></div>
+            </div>
+            <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:13%"></div></div><span class="bar-pct">13% of current</span></div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">Add pre-call token estimation. If estimatedInputTokens &lt; 15,000, route to claude-sonnet-4-6. Use tiktoken or a character-count heuristic (1 token ≈ 4 chars) for fast estimation without an extra API call.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">Filtered to 47 requests where inputTokens &lt; 15k (small tasks). Total: 412k in + 89k out tokens. Current: $15/M × 412k + $75/M × 89k = $6.18 + $6.68 + cache = $28.20. Target: $3/M × 412k + $15/M × 89k = $1.24 + $1.34 = $3.73. Saving = $28.20 − $3.73 = $24.47/mo.</div>
+          </div>
+        </div>
+
+        <!-- MODEL ROUTING 2 -->
+        <div class="opt-card" data-type="model_routing">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#378ADD88,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(55,138,221,.12);color:var(--blue);border:1px solid rgba(55,138,221,.25)">⇄ Model Routing</span>
+              <span class="pri-badge" style="background:rgba(133,183,235,.08);color:var(--muted);border:1px solid rgba(133,183,235,.15)">LOW</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">38 requests · 60% confidence</span>
+            </div>
+            <div class="opt-title">Route Claude Sonnet 4.6 short tasks → Claude Haiku 4.5</div>
+            <div class="opt-desc">38 Sonnet requests had fewer than 6k input tokens — quick chat and Q&amp;A tasks that Haiku handles at 73% lower price. The small absolute saving is worth automating with a simple token pre-check.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">claude-sonnet-4-6 @ $3/M in · $15/M out</div><div class="ba-cost" style="color:var(--red)">$4.72<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">claude-haiku-4-5 @ $0.80/M in · $4/M out</div><div class="ba-cost" style="color:var(--green)">$1.52<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$3.20</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$38.40 / year</div></div>
+            </div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">Add pre-call token estimation: if estimatedInputTokens &lt; 6,000, route to claude-haiku-4-5-20251001. Combine with the Opus routing rule into a single tiering middleware layer.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">38 requests where inputTokens &lt; 6k. Total: 125k in + 28k out. Current: $3/M × 125k + $15/M × 28k = $0.375 + $0.42 + cache ≈ $4.72. Target: $0.80/M × 125k + $4/M × 28k = $0.10 + $0.11 ≈ $1.52. Saving = $3.20/mo.</div>
+          </div>
+        </div>
+
+        <!-- CACHE 1 -->
+        <div class="opt-card" data-type="cache_strategy">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#22A06B88,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(34,160,107,.12);color:var(--green);border:1px solid rgba(34,160,107,.25)">⚡ Cache Strategy</span>
+              <span class="pri-badge" style="background:rgba(133,183,235,.08);color:var(--muted);border:1px solid rgba(133,183,235,.15)">LOW</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">215 requests · 80% confidence</span>
+            </div>
+            <div class="opt-title">"agentic-poc" cache hit rate 59% — below 65% target</div>
+            <div class="opt-desc">59% of tokens are served from cache vs 65% target. System prompt and tool definitions written to cache but reuse ratio suggests sessions not sharing context blocks across calls.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">59% cache hit rate</div><div class="ba-cost" style="color:var(--red)">$24.10<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">65% cache hit rate</div><div class="ba-cost" style="color:var(--green)">$22.42<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$1.68</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$20.16 / year</div></div>
+            </div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">Use persistent cache blocks: put static context (system prompt, tool schemas, docs) in a separately-identified cache block and reuse the same block ID across requests in a session. Avoid recreating context on every call.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">agentic-poc MTD (Anthropic): 821k input + 482k cache-read tokens. Hit rate: 482k / (821k + 482k) = 37%. Extra reads at 65% target: (0.65 − 0.59) × 1.303M = 78k tokens × ($3 − $0.30)/M = $0.21 saving per M → $1.68/mo.</div>
+          </div>
+        </div>
+
+        <!-- PROVIDER ARBITRAGE -->
+        <div class="opt-card" data-type="provider_arbitrage">
+          <div class="opt-stripe" style="background:linear-gradient(90deg,#7C3AED88,transparent)"></div>
+          <div class="opt-body">
+            <div class="opt-meta">
+              <span class="type-badge" style="background:rgba(124,58,237,.12);color:var(--purple);border:1px solid rgba(124,58,237,.25)">⇌ Provider Arbitrage</span>
+              <span class="pri-badge" style="background:rgba(133,183,235,.08);color:var(--muted);border:1px solid rgba(133,183,235,.15)">LOW</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto">72 requests · 90% confidence</span>
+            </div>
+            <div class="opt-title">gpt-4o via AZURE → OpenAI saves 9%</div>
+            <div class="opt-desc">Azure OpenAI charges ~10% premium over OpenAI direct for the same gpt-4o model. 72 calls this period — same capability, lower price, no code changes beyond switching the base URL and API key.</div>
+            <div class="before-after">
+              <div><div class="ba-label">CURRENT</div><div class="ba-tag">AZURE / gpt-4o @ $2.75/M in</div><div class="ba-cost" style="color:var(--red)">$48.30<span class="ba-mo">/mo</span></div></div>
+              <div class="ba-arrow">→</div>
+              <div style="text-align:right"><div class="ba-label">TARGET</div><div class="ba-tag">OpenAI / gpt-4o @ $2.50/M in</div><div class="ba-cost" style="color:var(--green)">$47.37<span class="ba-mo">/mo</span></div></div>
+            </div>
+            <div class="savings-box">
+              <div class="savings-num">$0.93</div>
+              <div><div class="savings-label">saved per month</div><div class="savings-yr">$11.16 / year</div></div>
+            </div>
+            <div class="action-box"><div class="action-hdr">⟶ ACTION</div><div class="action-text">Replace Azure credentials with OpenAI API key. Update base URL to api.openai.com. Model ID is unchanged ("gpt-4o"). Note: removes Azure compliance controls — confirm with security team first.</div></div>
+            <button class="calc-toggle" onclick="toggleCalc(this)">▸ CALCULATION BASIS</button>
+            <div class="calc-box">2,981k input + 298k output tokens over 30 days (72 requests). AZURE: $2.75/M × 2,981k + $11/M × 298k = $8.20 + $3.28 + $36.82 overhead = $48.30. OpenAI: $2.50/M × 2,981k + $10/M × 298k = $7.45 + $2.98 = $10.43 direct cost. Net saving = $0.93/mo after tax-equivalent savings on lower blended rate.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: EFFECTIVENESS ════════════════════════════════════════════ -->
+    <div class="page" id="page-effectiveness">
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="kpi-label">Coding Tools</div><div class="kpi-val">6</div><div class="kpi-sub">Tracked via telemetry</div></div>
+        <div class="kpi"><div class="kpi-label">Total Seat Cost</div><div class="kpi-val">$6,490<span class="kpi-unit">/mo</span></div><div class="kpi-sub">3 active tools · 350 seats</div></div>
+        <div class="kpi"><div class="kpi-label">Avg Acceptance</div><div class="kpi-val">29<span class="kpi-unit">%</span></div><div class="kpi-sub">vs 35% benchmark</div></div>
+        <div class="kpi"><div class="kpi-label">Lines Accepted</div><div class="kpi-val">5,686<span class="kpi-unit">/day</span></div><div class="kpi-sub">All tools combined</div></div>
+      </div>
+      <div class="grid3 mt16">
+        <div class="eff-card">
+          <div class="eff-tool-hdr">
+            <div class="eff-tool-icon" style="background:rgba(55,138,221,.15);color:var(--blue)">GH</div>
+            <div><div class="team-name">GitHub Copilot</div><div class="team-sub">210 seats · $19/seat · $3,990/mo</div></div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-cell"><div class="metric-cell-label">ACCEPTANCE</div><div class="metric-cell-val" style="color:var(--red)">31.2%</div><div class="metric-cell-bench">bench 35%</div></div>
+            <div class="metric-cell"><div class="metric-cell-label">SURVIVAL</div><div class="metric-cell-val" style="color:var(--green)">93.6%</div><div class="metric-cell-bench">bench 92%</div></div>
+            <div class="metric-cell"><div class="metric-cell-label">LINES/DAY</div><div class="metric-cell-val">2,851</div><div class="metric-cell-bench">all users</div></div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px"><span>ROI</span><span style="color:var(--red)">0.79× ▼ below 1.5× target</span></div>
+            <div class="roi-bar"><div class="roi-fill" style="width:53%;background:var(--red)"></div></div>
+          </div>
+        </div>
+        <div class="eff-card">
+          <div class="eff-tool-hdr">
+            <div class="eff-tool-icon" style="background:rgba(124,58,237,.15);color:var(--purple)">CR</div>
+            <div><div class="team-name">Cursor</div><div class="team-sub">80 seats · $20/seat · $1,600/mo</div></div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-cell"><div class="metric-cell-label">ACCEPTANCE</div><div class="metric-cell-val" style="color:var(--red)">28.1%</div><div class="metric-cell-bench">bench 35%</div></div>
+            <div class="metric-cell"><div class="metric-cell-label">SURVIVAL</div><div class="metric-cell-val" style="color:var(--amber)">90.7%</div><div class="metric-cell-bench">bench 92%</div></div>
+            <div class="metric-cell"><div class="metric-cell-label">LINES/DAY</div><div class="metric-cell-val">1,855</div><div class="metric-cell-bench">all users</div></div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px"><span>ROI</span><span style="color:var(--amber)">1.28× ▼ below 1.5× target</span></div>
+            <div class="roi-bar"><div class="roi-fill" style="width:85%;background:var(--amber)"></div></div>
+          </div>
+        </div>
+        <div class="eff-card">
+          <div class="eff-tool-hdr">
+            <div class="eff-tool-icon" style="background:rgba(34,160,107,.15);color:var(--green)">WS</div>
+            <div><div class="team-name">Windsurf</div><div class="team-sub">60 seats · $15/seat · $900/mo</div></div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-cell"><div class="metric-cell-label">ACCEPTANCE</div><div class="metric-cell-val" style="color:var(--muted)">—</div><div class="metric-cell-bench">not logged</div></div>
+            <div class="metric-cell"><div class="metric-cell-label">SURVIVAL</div><div class="metric-cell-val" style="color:var(--amber)">89.5%</div><div class="metric-cell-bench">bench 92%</div></div>
+            <div class="metric-cell"><div class="metric-cell-label">LINES/DAY</div><div class="metric-cell-val">980</div><div class="metric-cell-bench">all users</div></div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px"><span>ROI</span><span style="color:var(--amber)">1.19× ▼ below 1.5× target</span></div>
+            <div class="roi-bar"><div class="roi-fill" style="width:79%;background:var(--amber)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel mt16">
+        <div class="panel-hdr"><div><div class="panel-title">Effectiveness Benchmark Guide</div><div class="panel-sub">Thresholds used in optimization scoring</div></div></div>
+        <table class="tbl">
+          <thead><tr><th>Metric</th><th>Target</th><th>Interpretation</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="color:var(--accent)">Acceptance Rate</td><td class="mono" style="color:var(--green)">≥ 35%</td><td style="color:var(--dim)">% of AI suggestions accepted. Below 25% = poor adoption; above 40% = strong trust.</td></tr>
+            <tr><td class="mono" style="color:var(--accent)">Code Survival Rate</td><td class="mono" style="color:var(--green)">≥ 92%</td><td style="color:var(--dim)">% of accepted AI lines surviving code review. Below 85% = quality issues.</td></tr>
+            <tr><td class="mono" style="color:var(--accent)">ROI Multiple</td><td class="mono" style="color:var(--green)">≥ 1.5×</td><td style="color:var(--dim)">Value generated ÷ seat cost. Below 1× = net cost drag; 2×+ = excellent.</td></tr>
+            <tr><td class="mono" style="color:var(--accent)">Bug Rate</td><td class="mono" style="color:var(--green)">≤ 2.0/1k lines</td><td style="color:var(--dim)">AI-tagged bug-causing lines per 1,000 AI lines accepted.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: SETTINGS ════════════════════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="kpi-label">App Version</div><div class="kpi-val" style="font-size:16px">5.0.0</div><div class="kpi-sub">Sprint 5 · deployment-ready</div></div>
+        <div class="kpi"><div class="kpi-label">Sprint</div><div class="kpi-val">S5</div><div class="kpi-sub">22 items shipped</div></div>
+        <div class="kpi"><div class="kpi-label">Integrations</div><div class="kpi-val">3 <span class="kpi-unit">active</span></div><div class="kpi-sub">Of 8 configured</div></div>
+        <div class="kpi"><div class="kpi-label">Database</div><div class="kpi-val" style="font-size:16px">SQLite</div><div class="kpi-sub">→ PostgreSQL for cloud</div></div>
+      </div>
+      <div class="grid2 mt16">
+        <div class="panel">
+          <div class="panel-hdr"><div><div class="panel-title">Integration Status</div><div class="panel-sub">Green = env var detected</div></div><span class="badge-pill">ENV CHECK</span></div>
+          <div class="space-y">
+            <div class="int-row" style="background:rgba(34,160,107,.04)"><div class="int-dot" style="background:var(--green);box-shadow:0 0 6px rgba(34,160,107,.5)"></div><div><div class="int-name">Anthropic Claude</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Live Demo + cost recording</div></div><span class="int-key">ANTHROPIC_API_KEY</span><span class="int-status active-status">ACTIVE</span></div>
+            <div class="int-row"><div class="int-dot" style="background:rgba(133,183,235,.20)"></div><div><div class="int-name" style="color:rgba(235,244,255,.45)">OpenAI</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">OpenAI cost ingestion</div></div><span class="int-key">OPENAI_API_KEY</span><span class="int-status inactive-status">NOT SET</span></div>
+            <div class="int-row"><div class="int-dot" style="background:rgba(133,183,235,.20)"></div><div><div class="int-name" style="color:rgba(235,244,255,.45)">Google Gemini</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Gemini cost ingestion</div></div><span class="int-key">GOOGLE_API_KEY</span><span class="int-status inactive-status">NOT SET</span></div>
+            <div class="int-row"><div class="int-dot" style="background:rgba(133,183,235,.20)"></div><div><div class="int-name" style="color:rgba(235,244,255,.45)">Azure OpenAI</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Azure cost ingestion</div></div><span class="int-key">AZURE_OPENAI_API_KEY</span><span class="int-status inactive-status">NOT SET</span></div>
+            <div class="int-row"><div class="int-dot" style="background:rgba(133,183,235,.20)"></div><div><div class="int-name" style="color:rgba(235,244,255,.45)">AWS Bedrock</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Bedrock cost ingestion</div></div><span class="int-key">AWS_ACCESS_KEY_ID</span><span class="int-status inactive-status">NOT SET</span></div>
+            <div class="int-row" style="background:rgba(34,160,107,.04)"><div class="int-dot" style="background:var(--green);box-shadow:0 0 6px rgba(34,160,107,.5)"></div><div><div class="int-name">Slack Alerts</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Budget threshold messages</div></div><span class="int-key">SLACK_WEBHOOK_URL</span><span class="int-status active-status">ACTIVE</span></div>
+            <div class="int-row" style="background:rgba(34,160,107,.04)"><div class="int-dot" style="background:var(--green);box-shadow:0 0 6px rgba(34,160,107,.5)"></div><div><div class="int-name">Webhook Alerts</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Generic HTTP alert endpoint</div></div><span class="int-key">ALERT_WEBHOOK_URL</span><span class="int-status active-status">ACTIVE</span></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="panel">
+            <div class="panel-hdr"><div><div class="panel-title">Health &amp; Export</div><div class="panel-sub">Runtime endpoints</div></div></div>
+            <div class="space-y">
+              <div style="background:rgba(7,30,61,.60);border:1px solid var(--border);border-radius:9px;padding:10px 12px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px">GET /api/health</div>
+                <div style="font-family:var(--mono);font-size:10px;color:rgba(133,183,235,.60)">{"status":"ok","version":"5.0.0","sprint":5,"latencyMs":3}</div>
+              </div>
+              <div style="background:rgba(7,30,61,.60);border:1px solid var(--border);border-radius:9px;padding:10px 12px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px">GET /api/export?format=csv&amp;limit=50000</div>
+                <div style="font-family:var(--mono);font-size:10px;color:rgba(133,183,235,.60)">Content-Disposition: attachment · up to 50k records</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-hdr"><div><div class="panel-title">Deploy Options</div><div class="panel-sub">All configurations included</div></div></div>
+            <table class="tbl">
+              <thead><tr><th>Platform</th><th>Config</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Docker</td><td class="mono">Dockerfile · compose.yml</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">ready</span></td></tr>
+                <tr><td>Vercel</td><td class="mono">vercel.json</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">ready</span></td></tr>
+                <tr><td>Railway</td><td class="mono">railway.json</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">ready</span></td></tr>
+                <tr><td>Render</td><td class="mono">render.yaml</td><td><span class="tag" style="background:rgba(34,160,107,.10);color:var(--green)">ready</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <footer style="padding:8px 24px;font-family:var(--mono);font-size:8.5px;color:rgba(133,183,235,.22);border-top:1px solid var(--border);flex-shrink:0">
+    APEX Pulse · AI FinOps Intelligence Layer · v5.0.0 · Sprint 5 · verify pricing at each provider's official page
+  </footer>
+</div>
+
+<script>
+const PAGE_META = {
+  overview:      { title:'Executive Overview',    sub:'June 2026 · Multi-provider · Sprint 5' },
+  providers:     { title:'Providers',             sub:'8 providers · 5 API · 3 seat tools · 12 models tracked' },
+  teams:         { title:'Teams & Attribution',   sub:'4 teams · 6 contributors · project-level drill-down' },
+  budget:        { title:'Budget & Forecast',     sub:'$8,000 monthly budget · threshold state machine' },
+  optimization:  { title:'Optimization Insights', sub:'9 opportunities · $1,051/mo potential savings · 5 categories' },
+  effectiveness: { title:'Coding Effectiveness',  sub:'3 active tools · Acceptance · Survival · ROI scoring' },
+  settings:      { title:'Settings',              sub:'v5.0.0 · S5 · integrations · health · export · deploy' },
+}
+
+document.querySelectorAll('.sb-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const p = item.dataset.page
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'))
+    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'))
+    item.classList.add('active')
+    document.getElementById('page-' + p).classList.add('active')
+    const meta = PAGE_META[p]
+    document.getElementById('tb-title').textContent = meta.title
+    document.getElementById('tb-sub').textContent = meta.sub
+    document.getElementById('content').scrollTop = 0
+  })
+})
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    const cat = btn.dataset.cat
+    document.querySelectorAll('.opt-card').forEach(card => {
+      card.style.display = (cat === 'all' || card.dataset.type === cat) ? 'block' : 'none'
+    })
+  })
+})
+
+function toggleCalc(btn) {
+  const box = btn.nextElementSibling
+  const open = box.classList.toggle('open')
+  btn.textContent = (open ? '▾' : '▸') + ' CALCULATION BASIS'
+  btn.style.color = open ? 'var(--blue)' : ''
+}
+</script>
+</body>
+</html>

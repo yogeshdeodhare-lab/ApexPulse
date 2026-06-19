@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+
+# Prisma — never commit the SQLite database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Environment files — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+
+# Keep .env.example (it has no real secrets)
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# Editors
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Office lock files
+~$*
+
+# Misc
+.claude/

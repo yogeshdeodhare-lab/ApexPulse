@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── APEX Pulse™ brand token layer ──────────────────────────────────────── */
+:root {
+  /* Brand palette */
+  --primary:    #185FA5;
+  --action:     #378ADD;
+  --accent:     #85B7EB;
+  --deep:       #042C53;
+  --deep-mid:   #0C447C;
+
+  /* Dark-theme semantic tokens */
+  --bg:         #071E3D;
+  --panel:      #0D2845;
+  --panel2:     #0F3058;
+  --line:       rgba(133,183,235,0.13);
+  --txt:        #EBF4FF;
+  --muted:      #85B7EB;
+  --dim:        rgba(133,183,235,0.40);
+
+  /* Status / chart colors */
+  --cyan:       #378ADD;   /* primary interactive → APEX action */
+  --blue:       #85B7EB;   /* secondary → APEX accent */
+  --violet:     #7B96C9;
+  --green:      #22A06B;
+  --amber:      #C98A20;
+  --rose:       #E24B4A;
+  --orange:     #D97332;
+  --pink:       #B06BAA;
+  --sky:        #5AADDC;
+  --lime:       #3BA868;
+
+  /* Layout */
+  --sw:         228px;
+  --sw-rail:    60px;
+  --topbar-h:   52px;
+}
+
+/* Responsive sidebar width via CSS variable */
+@media (max-width: 1279px) { :root { --sw: var(--sw-rail); } }
+@media (max-width: 767px)  { :root { --sw: 0px; } }
+
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+body {
+  background-color: #071E3D;
+  background-image:
+    radial-gradient(ellipse at 15% 40%, rgba(24,95,165,0.16) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(55,138,221,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 65% 92%, rgba(12,68,124,0.13) 0%, transparent 48%);
+  color: var(--txt);
+  font-family: var(--font-sans, 'Plus Jakarta Sans'), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  display: flex;
+  overflow: hidden;
+}
+
+.font-mono, code, pre {
+  font-family: var(--font-mono, 'JetBrains Mono'), 'Cascadia Code', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(133,183,235,0.18); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(133,183,235,0.32); }
+
+/* ── Glassmorphism ──────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(13,40,69,0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(133,183,235,0.16);
+}
+.glass-heavy {
+  background: rgba(7,30,61,0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(133,183,235,0.18);
+}
+
+/* ── Immersive card lift ────────────────────────────────────────────────── */
+.card-lift {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.30), 0 0 28px rgba(55,138,221,0.09);
+  border-color: rgba(133,183,235,0.32) !important;
+}
+
+/* ── Gradient top border accent on panels ──────────────────────────────── */
+.panel-accent::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, #378ADD 0%, #85B7EB 50%, transparent 100%);
+  border-radius: 2px 2px 0 0;
+  margin: -1px -1px 0;
+}
+
+/* ── Page hero strip ────────────────────────────────────────────────────── */
+.page-hero {
+  background: linear-gradient(135deg, rgba(24,95,165,0.18) 0%, rgba(55,138,221,0.06) 50%, transparent 100%);
+  border-bottom: 1px solid rgba(133,183,235,0.10);
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+@keyframes pulse2 {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+.animate-pulse2 { animation: pulse2 2.2s ease-in-out infinite; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn { animation: fadeIn 0.35s ease; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slideUp { animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(55,138,221,0.30); }
+  50%       { box-shadow: 0 0 20px rgba(55,138,221,0.60); }
+}
+.animate-glow { animation: glowPulse 2.5s ease-in-out infinite; }
+
+@keyframes ecgDraw {
+  from { stroke-dashoffset: 200; }
+  to   { stroke-dashoffset: 0; }
+}
+.animate-ecg {
+  stroke-dasharray: 200;
+  animation: ecgDraw 1.8s ease-out forwards;
+}
+
+/* ── Mobile sidebar backdrop ────────────────────────────────────────────── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,44,83,0.70);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 40;
+}
+
+/* ── Mobile bottom nav ──────────────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(4,44,83,0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(133,183,235,0.14);
+  display: none;
+  z-index: 30;
+}
+@media (max-width: 767px) {
+  .bottom-nav { display: flex; }
+  /* Add padding to main content so bottom nav doesn't cover it */
+  main { padding-bottom: 68px !important; }
+}

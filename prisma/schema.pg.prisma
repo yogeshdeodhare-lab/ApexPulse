@@ -1,0 +1,133 @@
+// PostgreSQL schema — use for enterprise / production deployments
+// Switch steps:
+//   1. Set DATABASE_URL=postgresql://user:pass@host:5432/apex_pulse
+//   2. cp prisma/schema.pg.prisma prisma/schema.prisma
+//   3. npm run db:migrate  (runs prisma migrate deploy)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UsageRecord {
+  id               String   @id @default(uuid())
+  timestamp        DateTime @default(now()) @db.Timestamptz
+  provider         String   @default("anthropic")
+  model            String
+  inputTokens      Int      @default(0)
+  outputTokens     Int      @default(0)
+  cacheReadTokens  Int      @default(0)
+  cacheWriteTokens Int      @default(0)
+  totalCost        Float    @default(0)
+  inputCost        Float    @default(0)
+  outputCost       Float    @default(0)
+  cacheReadCost    Float    @default(0)
+  cacheWriteCost   Float    @default(0)
+  userId           String?
+  teamId           String?
+  projectId        String?
+  prompt           String?
+  latencyMs        Int?
+  source           String   @default("api")
+
+  @@index([timestamp])
+  @@index([provider, model])
+  @@index([projectId])
+  @@index([userId])
+  @@index([teamId])
+}
+
+model SeatAllocation {
+  id           String   @id @default(uuid())
+  period       String
+  provider     String
+  seats        Int
+  pricePerSeat Float
+  createdAt    DateTime @default(now()) @db.Timestamptz
+
+  @@unique([period, provider])
+  @@index([period])
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  period    String   @unique
+  amount    Float
+  teamId    String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  @@index([period])
+  @@index([teamId])
+}
+
+model CopilotEffectivenessSnapshot {
+  id                    String   @id @default(uuid())
+  dateKey               DateTime @db.Timestamptz
+  codingTool            String
+  teamId                String?
+  suggestionsShown      Int      @default(0)
+  suggestionsAccepted   Int      @default(0)
+  linesShown            Int      @default(0)
+  linesAccepted         Int      @default(0)
+  acceptanceRate        Float?
+  survivalRate          Float?
+  bugTaggedIssues       Int      @default(0)
+  avgPrMergeTimeHours   Float?
+  reviewCommentsPerPr   Float?
+  aiAssistedPrs         Int      @default(0)
+  productivityIndex     Float?
+  attributionConfidence Int      @default(2)
+  toolDailyCost         Float    @default(0)
+  createdAt             DateTime @default(now()) @db.Timestamptz
+
+  @@unique([dateKey, codingTool, teamId])
+  @@index([dateKey])
+  @@index([codingTool])
+}
+
+model AppConfig {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  updatedBy   String?
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  name         String?
+  passwordHash String?
+  role         String    @default("viewer")
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now()) @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @db.Timestamptz
+  lastLoginAt  DateTime? @db.Timestamptz
+
+  @@index([email])
+  @@index([role])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  timestamp  DateTime @default(now()) @db.Timestamptz
+  action     String
+  resource   String
+  resourceId String?
+  userId     String?
+  userEmail  String?
+  ipAddress  String?
+  before     String?
+  after      String?
+  metadata   String?
+
+  @@index([timestamp])
+  @@index([resource])
+  @@index([userId])
+  @@index([action])
+}
