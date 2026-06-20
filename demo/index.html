@@ -1816,8 +1816,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var ch = Math.round((cache[i] - b) / maxV * H)
       wrap.insertAdjacentHTML('beforeend',
         '<div class="dbwrap">'
-        + '<div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:1px;height:' + H + 'px">'
-          + '<div class="dbbar" style="height:' + ch + 'px;background:rgba(133,183,235,.22);width:80%"></div>'
+        + '<div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:1px;height:' + H + 'px;width:100%">'
+          + '<div class="dbbar" style="height:' + ch + 'px;background:rgba(133,183,235,.45);width:80%"></div>'
           + '<div class="dbbar" style="height:' + bh + 'px;background:var(--blue);width:80%"></div>'
         + '</div>'
         + '<div class="dblabel">' + days[i] + '</div>'
