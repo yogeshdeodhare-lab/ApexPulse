@@ -98,10 +98,10 @@ body{display:flex;background:radial-gradient(ellipse 140% 80% at 50% -20%,#0D3B7
 .dval{font-family:var(--mono);font-size:10px;font-weight:600}
 
 /* day bars */
-.daybars{display:flex;align-items:flex-end;gap:3px;height:64px}
+.daybars{display:flex;align-items:flex-end;gap:3px;height:80px}
 .dbwrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%}
-.dbbar{width:100%;border-radius:2px 2px 0 0;min-height:2px}
-.dblabel{font-family:var(--mono);font-size:7px;color:rgba(133,183,235,.28);text-align:center}
+.dbbar{width:100%;border-radius:2px 2px 0 0;min-height:2px;flex-shrink:0}
+.dblabel{font-family:var(--mono);font-size:7px;color:rgba(133,183,235,.28);text-align:center;flex-shrink:0}
 
 /* scrollbar */
 ::-webkit-scrollbar{width:4px}
@@ -1816,7 +1816,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var ch = Math.round((cache[i] - b) / maxV * H)
       wrap.insertAdjacentHTML('beforeend',
         '<div class="dbwrap">'
-        + '<div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:1px;height:' + H + 'px;width:100%">'
+        + '<div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:1px;height:' + H + 'px;width:100%;flex-shrink:0">'
           + '<div class="dbbar" style="height:' + ch + 'px;background:rgba(133,183,235,.45);width:80%"></div>'
           + '<div class="dbbar" style="height:' + bh + 'px;background:var(--blue);width:80%"></div>'
         + '</div>'
